@@ -6,11 +6,13 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/26 09:41:40 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/28 16:04:21 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
+
+int	aa = 1;
 
 int	main(int ac, char **av, char **env)
 {
@@ -20,12 +22,12 @@ int	main(int ac, char **av, char **env)
 
 	printf("PID %d\n", getpid());
 	(signal(SIGTERM, SIG_IGN));
-	printf("%d\n", getpid());
 	head = NULL;
 	data.status = 0;
 	data.in = 0;
 	data.out = 1;
 	data.exec = 0;
+	data.red = 0;
 	(void)av;
 	(void)env;
 	if (ac != 1)
@@ -34,9 +36,19 @@ int	main(int ac, char **av, char **env)
 	{
 		ft_pwd(0, &data);
 		line = readline(" ");
+		if (!line)
+			return (1);
 		add_history(line);
-		head = ft_nested_pip(line);
-		ft_nested_pip_ex(head, env, &data, STDOUT_FILENO, STDIN_FILENO);
+		// head = ft_split_linked_pip(line, '|');
+		// ft_display(head);
+		head = ft_nested_pip(line, &data);
+		if (data.red == 1)
+		{
+			printf("minishell: syntax error near unexpected token\n");
+			data.red = 0;
+		}
+		else
+			ft_nested_pip_ex(head, env, &data, STDOUT_FILENO, STDIN_FILENO);
 	}
 	return (0);
 }

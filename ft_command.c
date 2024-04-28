@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/25 22:55:24 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/27 20:00:32 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,10 @@ void	ft_display(t_list *ptr)
 	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	while (ptr)
 	{
-		if (strcmp((char *)ptr->content, "||") != 0
-			&& strcmp((char *)ptr->content, "&&") != 0)
-			printf("%s\n", (char *)ptr->content);
+		// if (strcmp((char *)ptr->content, "||") != 0
+		// 	&& strcmp((char *)ptr->content, "&&") != 0)
+		printf("%s\n", (char *)ptr->content);
+		printf("%d\n", ptr->x);
 		ptr = ptr->next;
 	}
 	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
@@ -78,16 +79,28 @@ t_list	*ft_new_split(char *str, t_quotes data)
 	int		count;
 	char	*cmd;
 	t_list	*head;
+	char	*s;
 
 	i = 0;
 	count = 0;
 	cmd = NULL;
 	head = NULL;
+	str = ft_strtrim(str, " ");
 	while (str[i])
 	{
 		ft_check_quotes(str[i], &data);
-		if (str[i] == ' ' && data.count_qutes == 0 && !data.count_sgl)
-			cmd = ft_strtrim(ft_substr(str, i - count, count), " ");
+		if ((str[i] == ' ' || !str[i + 1]) && data.cq == 0 && !data.cs
+			&& !data.cp)
+		{
+			if (!str[i + 1])
+				s = ft_strtrim(ft_substr(str, i - count, count + 1), " ");
+			else
+				s = ft_strtrim(ft_substr(str, i - count, count), " ");
+			if (s[0])
+				cmd = s;
+			else
+				cmd = NULL;
+		}
 		if (cmd)
 		{
 			ft_lstadd_back(&head, ft_lstnew(cmd));
@@ -97,8 +110,8 @@ t_list	*ft_new_split(char *str, t_quotes data)
 		count++;
 		i++;
 	}
-	cmd = ft_strtrim(ft_substr(str, i - count, count), " ");
-	ft_lstadd_back(&head, ft_lstnew(cmd));
+	if (data.cq || data.cs || data.cp)
+		return (NULL);
 	return (head);
 }
 
@@ -171,6 +184,8 @@ char	**last_command(t_list *head)
 	int		size;
 	char	**arr;
 
+	if (!head)
+		return (NULL);
 	i = 0;
 	size = ft_lstsize(head);
 	arr = malloc(sizeof(char *) * (size + 1));
@@ -190,6 +205,11 @@ void	ft_print(char **arr)
 {
 	int	i;
 
+	if (!arr)
+	{
+		printf("Syntax Error\n");
+		return ;
+	}
 	i = 0;
 	while (arr[i])
 	{

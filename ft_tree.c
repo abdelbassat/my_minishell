@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:27:06 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/25 22:33:29 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/28 16:53:02 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,56 +14,67 @@
 
 void	ft_check_quotes(char c, t_quotes *data)
 {
-	if (c == '(' && !data->count_qutes && !data->count_sgl)
-		data->count_par++;
-	else if (c == ')' && !data->count_qutes && !data->count_sgl)
-		data->count_par--;
-	if (c == 34 && !data->count_qutes)
-		data->count_qutes++;
+	if (c == '(' && !data->cq && !data->cs)
+		data->cp++;
+	else if (c == ')' && !data->cq && !data->cs)
+		data->cp--;
+	if (c == 34 && !data->cq)
+		data->cq++;
 	else if (c == 34)
-		data->count_qutes--;
-	if (c == 39 && !data->count_qutes && !data->count_sgl)
-		data->count_sgl++;
-	else if (c == 39 && !data->count_qutes)
-		data->count_sgl--;
+		data->cq--;
+	if (c == 39 && !data->cq && !data->cs)
+		data->cs++;
+	else if (c == 39 && !data->cq)
+		data->cs--;
+}
+
+void	ini_str(t_str *data)
+{
+	data->str1 = NULL;
+	data->str2 = NULL;
 }
 
 t_list	*split_end_or(char *str)
 {
 	int			i;
-	int			count;
-	char		*cmd;
 	t_list		*head;
 	t_quotes	data;
+	char		c;
+	char		*join;
+	int			flag;
+	t_list		*node;
 
-	cmd = NULL;
+	join = NULL;
 	head = NULL;
 	i = 0;
+	flag = 0;
 	initialize(&data);
-	count = 0;
 	while (str[i])
 	{
 		ft_check_quotes(str[i], &data);
-		if (str[i] == '|' && str[i + 1] == '|' && !data.count_par
-			&& !data.count_qutes && !data.count_sgl)
-			cmd = ft_strtrim(ft_substr(str, i - count, count), " ");
-		else if (str[i] == '&' && str[i + 1] == '&' && !data.count_par
-			&& !data.count_qutes && !data.count_sgl)
-			cmd = ft_strtrim(ft_substr(str, i - count, count), " ");
-		if (cmd)
+		if (str[i] == '|' || str[i] == '&')
+			c = str[i];
+		if (str[i] == c && str[i + 1] == c && !data.cp && !data.cq && !data.cs)
+			flag = 1;
+		else
+			join = ft_new_strjoin(join, str[i]);
+		if (flag == 1 || !str[i + 1])
 		{
-			ft_lstadd_back(&head, ft_lstnew(cmd));
-			cmd = ft_substr(str, i, 2);
-			ft_lstadd_back(&head, ft_lstnew(cmd));
-			i += 2;
-			count = 0;
-			cmd = NULL;
+			if (join && ft_strtrim(join, " ")[0])
+				ft_lstadd_back(&head, ft_lstnew(join));
+			if (str[i + 1])
+			{
+				join = ft_new_strjoin(NULL, str[i]);
+				node = ft_lstnew(ft_strjoin(join, join));
+				node->x = 4;
+				ft_lstadd_back(&head, node);
+				i++;
+			}
+			join = NULL;
+			flag = 0;
 		}
-		count++;
 		i++;
 	}
-	cmd = ft_strtrim(ft_substr(str, i - count, count), " ");
-	ft_lstadd_back(&head, ft_lstnew(cmd));
 	return (head);
 }
 
@@ -86,37 +97,50 @@ void	ft_print_tree(t_list *head)
 	printf("--------------------------------------------\n");
 }
 
-t_list	*ft_nested_pip(char *line)
+t_list	*ft_nested_pip(char *line, t_data *data)
 {
 	t_list	*head;
 	t_list	*new;
 	t_list	*list;
 	char	*cmd;
 
+	new = NULL;
 	head = split_end_or(line);
-	new = head;
-	list = NULL;
-	while (head)
+	if (ft_check_syntax(head) == 1)
+		data->red = 1;
+	if (data->red == 0)
 	{
-		cmd = (char *)head->content;
-		if (strcmp(cmd, "||") != 0 && strcmp(cmd, "&&") != 0)
+		new = head;
+		list = NULL;
+		while (head)
 		{
-			list = ft_split_linked_pip(cmd, '|');
-			head->new_list = list;
-			while (list)
+			cmd = (char *)head->content;
+			if (!head->x)
 			{
-				if (ft_strchr((char *)list->content, '(') != NULL)
+				list = ft_split_linked_pip(cmd, '|');
+				if (ft_check_syntax(list) == 1)
+					data->red = 1;
+				if (data->red == 0)
 				{
-					list->x = 1;
-					list->content = ft_strtrim((char *)list->content, "() |");
-					list->new_list = ft_nested_pip((char *)list->content);
+					head->new_list = list;
+					while (list)
+					{
+						if (ft_strchr((char *)list->content, '(') != NULL)
+						{
+							list->x = 1;
+							list->content = ft_strtrim((char *)list->content,
+									"() ");
+							list->new_list = ft_nested_pip((char *)list->content,
+									data);
+						}
+						list = list->next;
+					}
 				}
-				list = list->next;
 			}
+			else
+				head->new_list = NULL;
+			head = head->next;
 		}
-		else
-			head->new_list = NULL;
-		head = head->next;
 	}
 	return (new);
 }
@@ -159,6 +183,21 @@ void	wait_proccess(t_data *data)
 	}
 }
 
+int	ft_check_syntax(t_list *head)
+{
+	int	i;
+
+	i = 0;
+	while (head)
+	{
+		if (head->x == 4 && (!head->next || head->next->x == 4 || i == 0))
+			return (1);
+		head = head->next;
+		i++;
+	}
+	return (0);
+}
+
 void	ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
 		int fd0)
 {
@@ -175,38 +214,40 @@ void	ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
 		{
 			while (head->new_list)
 			{
-				if (head->new_list->next != NULL)
+				if (head->new_list->x == 0)
 				{
-					pipe(fd);
-					data->out = fd[1];
-				}
-				else
-					data->out = fd1;
-				if (head->new_list->x == 1)
-				{
-					p = fork();
-					if (p == 0)
+					if (head->new_list->next != NULL)
 					{
-						ft_nested_pip_ex(head->new_list->new_list, env, data,
-							data->out, data->in);
-						data->status = 1;
-						exit(1);
+						pipe(fd);
+						data->out = fd[1];
 					}
-				}
-				else
-					ft_command((char *)head->new_list->content, env, data,
-						data->out, data->in, fd[0]);
-				if (head->new_list->next != NULL)
-				{
-					close(fd[1]);
-					if (data->in != 0)
-						close(data->in);
-					data->in = fd[0];
-				}
-				else if (head->next == NULL)
-				{
-					if (data->in != 0)
-						close(data->in);
+					else
+						data->out = fd1;
+					if (head->new_list->x == 1)
+					{
+						p = fork();
+						if (p == 0)
+						{
+							ft_nested_pip_ex(head->new_list->new_list, env,
+								data, data->out, data->in);
+							exit(1);
+						}
+					}
+					else
+						ft_command((char *)head->new_list->content, env, data,
+							data->out, data->in, fd[0]);
+					if (head->new_list->next != NULL)
+					{
+						close(fd[1]);
+						if (data->in != fd0)
+							close(data->in);
+						data->in = fd[0];
+					}
+					else if (head->next == NULL)
+					{
+						if (data->in != fd0)
+							close(data->in);
+					}
 				}
 				head->new_list = head->new_list->next;
 			}

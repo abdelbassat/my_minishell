@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/25 14:19:18 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/26 16:03:22 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,48 @@ int	access_outfile(char *path)
 		return (0);
 	fd = open(path, O_TRUNC | O_RDWR);
 	return (fd);
+}
+
+t_list	*ft_redic(char *line)
+{
+	int		i;
+	t_list	*head;
+	char	*join;
+	int		flag;
+	char	c;
+
+	i = 0;
+	head = NULL;
+	join = NULL;
+	flag = 0;
+	while (line[i])
+	{
+		if (line[i] == '>' || line[i] == '<')
+			c = line[i];
+		if (line[i] == c)
+		{
+			if (line[i + 1] == c)
+			{
+				ft_lstadd_back(&head, ft_lstnew(ft_substr(line, i, 2)));
+				i++;
+			}
+			else
+				ft_lstadd_back(&head, ft_lstnew(ft_substr(line, i, 1)));
+			i++;
+			while (line[i] != '<' && line[i] != '>' && line[i])
+			{
+				flag = 1;
+				join = ft_new_strjoin(join, line[i]);
+				i++;
+			}
+			if (flag == 1)
+			{
+				flag = 0;
+				ft_lstadd_back(&head, ft_lstnew(join));
+			}
+		}
+		else
+			return (NULL);
+	}
+	return (head);
 }
