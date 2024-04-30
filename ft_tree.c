@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:27:06 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/29 18:10:58 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/30 21:28:38 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,70 +34,105 @@ void	ft_check_quotes(char c, t_quotes *data)
 
 void	ini_str(t_str *data)
 {
-	data->str1 = NULL;
-	data->str2 = NULL;
+	data->str = NULL;
+	data->join = NULL;
+	data->flag = 0;
+	data->c = 0;
 }
 
-t_list	*split_end_or(char *str, char *set, int check)
+void	ft_lstnew_back(t_list **head, char *cont, int flag)
+{
+	t_list	*node;
+
+	node = ft_lstnew(cont);
+	if (((char *)node->content)[0])
+	{
+		node->x = flag;
+		ft_lstadd_back(head, node);
+	}
+	else
+		ft_lstdelone(node, free);
+}
+
+void	utils_split(t_str *strr, t_list **head, int *i)
+{
+	if (strr->join)
+	{
+		ft_lstnew_back(head, strr->join, 0);
+		free(strr->join);
+	}
+	if (strr->str[*i + 1])
+	{
+		if (strr->str[*i] != ' ')
+			strr->join = ft_new_strjoin(NULL, strr->str[*i]);
+		if (strr->str[*i + 1] == strr->c && strr->c != ' ')
+		{
+			*i = *i + 1;
+			strr->join = ft_strjoin(strr->join, strr->join);
+		}
+		if (strr->c != ' ')
+		{
+			ft_lstnew_back(head, strr->join, 4);
+			free(strr->join);
+		}
+	}
+	strr->join = NULL;
+	strr->flag = 0;
+}
+
+void	charset(char c, char *set, t_str *strr)
+{
+	int	i;
+
+	i = 0;
+	while (set[i])
+	{
+		if (c == set[i])
+		{
+			strr->c = set[i];
+			break ;
+		}
+		i++;
+	}
+}
+
+t_list	*split_end_or(char *line, char *set, int check)
 {
 	int			i;
 	t_list		*head;
 	t_quotes	data;
-	char		c;
-	char		*join;
-	int			flag;
-	t_list		*node;
+	t_str		strr;
 
-	join = NULL;
 	head = NULL;
 	i = 0;
-	flag = 0;
+	ini_str(&strr);
 	initialize(&data);
-	while (str[i])
+	strr.str = line;
+	while (line[i])
 	{
-		ft_check_quotes(str[i], &data);
-		if (str[i] == set[0] || str[i] == set[1] || str[i] == ' ')
-			c = str[i];
-		if (str[i] == c && (check == 0 || str[i + 1] == c) && !data.cp
-			&& !data.cq && !data.cs)
-			flag = 1;
+		ft_check_quotes(line[i], &data);
+		charset(line[i], set, &strr);
+		if (line[i] == strr.c && (check == 0 || line[i + 1] == strr.c)
+			&& !data.cp && !data.cq && !data.cs)
+			strr.flag = 1;
 		else
-			join = ft_new_strjoin(join, str[i]);
-		if (flag == 1 || !str[i + 1])
-		{
-			if (join && ft_strtrim(join, " ")[0])
-				ft_lstadd_back(&head, ft_lstnew(join));
-			if (str[i + 1])
-			{
-				if (str[i] != ' ')
-					join = ft_new_strjoin(NULL, str[i]);
-				if (str[i + 1] == c && c != ' ')
-				{
-					i++;
-					join = ft_strjoin(join, join);
-				}
-				node = ft_lstnew(join);
-				node->x = 4;
-				if (str[i] != ' ')
-					ft_lstadd_back(&head, node);
-			}
-			join = NULL;
-			flag = 0;
-		}
+			strr.join = ft_new_strjoin(strr.join, line[i]);
+		if (strr.flag == 1 || !line[i + 1])
+			utils_split(&strr, &head, &i);
 		i++;
 	}
 	return (head);
 }
 
-int	ft_count_qutes(char *str, t_quotes *qutes)
+int	ft_count_qutes(char *line, t_quotes *qutes)
 {
 	int	i;
 
 	i = 0;
 	initialize(qutes);
-	while (str[i])
+	while (line[i])
 	{
-		ft_check_quotes(str[i], qutes);
+		ft_check_quotes(line[i], qutes);
 		if (qutes->cp == 1)
 			return (1);
 		i++;
@@ -129,47 +164,36 @@ t_list	*ft_nested_pip(char *line, t_data *data)
 	t_list		*head;
 	t_list		*new;
 	t_list		*list;
-	t_list		*par;
 	t_quotes	qutes;
-	char		*cmd;
-	char		*command;
+	t_list		*command_list;
+	t_list		*redic;
 
-	new = NULL;
+	command_list = NULL;
+	redic = NULL;
 	head = split_end_or(line, "|&", 1);
-	if (data->red == 0)
+	new = head;
+	while (head)
 	{
-		new = head;
-		list = NULL;
-		while (head)
+		if (!head->x)
 		{
-			cmd = (char *)head->content;
-			if (!head->x)
+			list = split_end_or((char *)head->content, "|", 0);
+			head->new_list = list;
+			while (list)
 			{
-				list = ft_split_linked_pip(cmd, '|', 0);
-				if (data->red == 0)
+				if (ft_count_qutes((char *)list->content, &qutes) == 1)
 				{
-					head->new_list = list;
-					while (list)
-					{
-						command = (char *)list->content;
-						if (ft_count_qutes(command, &qutes) == 1)
-						{
-							par = ft_split_linked_pip(command, ' ', 1);
-							par->content = ft_strtrim((char *)par->content, " ");
-							list->x = 1;
-							list->content = ft_substr(par->content, 1,
-									ft_strlen(par->content) - 2);
-							list->new_list = ft_nested_pip((char *)list->content,
-									data);
-						}
-						list = list->next;
-					}
+					ft_handel_redic((char *)list->content, &command_list,
+						&redic, data);
+					list->x = 1;
+					list->in = data->in;
+					list->content = ft_substr((char *)command_list->content, 1,
+							ft_strlen(command_list->content) - 2);
+					list->new_list = ft_nested_pip((char *)list->content, data);
 				}
+				list = list->next;
 			}
-			else
-				head->new_list = NULL;
-			head = head->next;
 		}
+		head = head->next;
 	}
 	return (new);
 }
@@ -178,7 +202,7 @@ void	check_eo(t_list *head, t_data *data, int fd1, int fd0)
 {
 	char	*op;
 
-	op = ft_strtrim((char *)head->content, " ");
+	op = (char *)head->content;
 	if (strcmp(op, "&&") == 0)
 	{
 		if (data->status == 0)
@@ -205,12 +229,14 @@ void	wait_proccess(t_data *data)
 	int	status;
 	int	tmp;
 
-	// problem in command not found
 	while (1)
 	{
 		status = wait(&tmp);
 		if (status == data->pid)
-			data->status = tmp;
+		{
+			if (data->status != 127)
+				data->status = tmp;
+		}
 		else if (status == -1)
 			break ;
 	}
@@ -231,15 +257,50 @@ int	ft_check_syntax(t_list *head)
 	return (0);
 }
 
-void	ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
-		int fd0)
+void	ft_exec_pip(t_list *head, t_data *data, int fd1, int fd0)
 {
-	int	fd[2];
 	int	p;
 
+	if (head->new_list->next != NULL)
+	{
+		pipe(data->fd);
+		data->out = data->fd[1];
+	}
+	else
+		data->out = fd1;
+	if (head->new_list->x == 1)
+	{
+		p = fork();
+		if (p == 0)
+		{
+			data->in = head->new_list->in;
+			data->out = head->new_list->out;
+			ft_nested_pip_ex(head->new_list->new_list, data, data->out,
+				data->in);
+			exit(1);
+		}
+	}
+	else
+		ft_command((char *)head->new_list->content, data);
+	if (head->new_list->next != NULL)
+	{
+		close(data->fd[1]);
+		if (data->in != fd0)
+			close(data->in);
+		data->in = data->fd[0];
+	}
+	else if (head->next == NULL)
+	{
+		if (data->in != fd0)
+			close(data->in);
+	}
+}
+
+void	ft_nested_pip_ex(t_list *head, t_data *data, int fd1, int fd0)
+{
 	data->exec = 0;
-	data->out = fd1;
-	data->in = fd0;
+	// data->out = fd1;
+	// data->in = fd0;
 	while (head)
 	{
 		check_eo(head, data, fd1, fd0);
@@ -248,40 +309,7 @@ void	ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
 			while (head->new_list)
 			{
 				if (head->new_list->x != 4)
-				{
-					if (head->new_list->next != NULL)
-					{
-						pipe(fd);
-						data->out = fd[1];
-					}
-					else
-						data->out = fd1;
-					if (head->new_list->x == 1)
-					{
-						p = fork();
-						if (p == 0)
-						{
-							ft_nested_pip_ex(head->new_list->new_list, env,
-								data, data->out, data->in);
-							exit(1);
-						}
-					}
-					else
-						ft_command((char *)head->new_list->content, env, data,
-							data->out, data->in, fd[0]);
-					if (head->new_list->next != NULL)
-					{
-						close(fd[1]);
-						if (data->in != fd0)
-							close(data->in);
-						data->in = fd[0];
-					}
-					else if (head->next == NULL)
-					{
-						if (data->in != fd0)
-							close(data->in);
-					}
-				}
+					ft_exec_pip(head, data, fd1, fd0);
 				head->new_list = head->new_list->next;
 			}
 			wait_proccess(data);
@@ -313,16 +341,16 @@ void	ft_nested_pip_syntax(t_list *head, t_data *data)
 
 //////////////////check syntax ////////////////////
 
-void	ft_check_string(char *str, t_data *data)
+void	ft_check_string(char *line, t_data *data)
 {
 	int			i;
 	t_quotes	qutes;
 
 	i = 0;
 	initialize(&qutes);
-	while (str[i])
+	while (line[i])
 	{
-		ft_check_quotes(str[i], &qutes);
+		ft_check_quotes(line[i], &qutes);
 		i++;
 	}
 	if (qutes.cp || qutes.cq || qutes.cs || (qutes.en % 2) || (qutes.bk % 2))

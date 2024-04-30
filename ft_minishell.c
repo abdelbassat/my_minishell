@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/29 17:12:19 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/30 19:02:45 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ int	main(int ac, char **av, char **env)
 	t_data	data;
 	t_list	*head;
 
+	line = NULL;
 	printf("PID %d\n", getpid());
 	(signal(SIGTERM, SIG_IGN));
 	head = NULL;
@@ -30,19 +31,21 @@ int	main(int ac, char **av, char **env)
 	data.out = 1;
 	data.exec = 0;
 	data.red = 0;
+	data.env = env;
 	(void)av;
 	(void)env;
 	if (ac != 1)
 		return (1);
 	while (1)
 	{
-		ft_pwd(0, &data);
-		line = readline(" ");
+		line = ft_pwd(0);
+		line = readline(line);
+		add_history(line);
 		if (!line)
 			return (1);
-		add_history(line);
-		// ft_nested_pip_syntax(head, &data);
-		// ft_check_string(line, &data);
+		// printf("%s\n", line);
+		// head = split_end_or(line, "|", 0);
+		// ft_display(head);
 		head = ft_nested_pip(line, &data);
 		if (data.red == 1)
 		{
@@ -50,7 +53,7 @@ int	main(int ac, char **av, char **env)
 			data.red = 0;
 		}
 		else
-			ft_nested_pip_ex(head, env, &data, STDOUT_FILENO, STDIN_FILENO);
+			ft_nested_pip_ex(head, &data, STDOUT_FILENO, STDIN_FILENO);
 	}
 	return (0);
 }

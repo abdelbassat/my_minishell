@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/29 17:07:34 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/30 21:10:12 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,11 @@ typedef struct Data
 	int		fd[2];
 	int		in;
 	int		out;
-	int		ex;
-	int		ex1;
+	int		fd1;
+	int		fd0;
 	int		red;
 	int		pid;
+	char	**env;
 	int		exec;
 }			t_data;
 
@@ -53,17 +54,22 @@ typedef struct quotes
 
 typedef struct STR
 {
-	char	*str1;
-	char	*str2;
+	char	*str;
+	char	*join;
 	char	c;
 	int		i;
+	int		flag;
 }			t_str;
+void		ft_handel_redic(char *line, t_list **command_list, t_list **redic,
+				t_data *data);
+void		ft_exec_utils(t_list *head, t_data *data);
+void		ft_exec_redic(t_list *head, t_data *data);
+void		ft_lstnew_back(t_list **head, char *cont, int flag);
 void		ft_exec_redic(t_list *head, t_data *data);
 void		ft_nested_pip_syntax(t_list *head, t_data *data);
 t_list		*ft_split_rediction(t_list *head, t_list **new);
 int			ft_check_syntax(t_list *head);
-void		ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
-				int fd0);
+void		ft_nested_pip_ex(t_list *head, t_data *data, int fd1, int fd0);
 void		ft_print_tree(t_list *head);
 t_list		*ft_split_linked_pip(char *str, char c, int flag);
 t_list		*ft_nested_pip(char *line, t_data *data);
@@ -77,15 +83,12 @@ void		red(void);
 void		cyan(void);
 void		yellow(void);
 void		reset(void);
-void		ft_pwd(int flags, t_data *data);
+char		*ft_pwd(int flags);
 void		ft_check_quotes(char c, t_quotes *data);
-void		ft_command(char *line, char **env, t_data *data, int fd1, int fd0,
-				int cls);
-void		ft_print(char **arr);
-t_list		*ft_new_split(char *str, t_quotes data);
+void		ft_command(char *line, t_data *data);
+int			ft_read_stdin(char *end);
 void		ft_free(char **str);
 char		*ft_check_command(char *cmd);
-void		ft_print(char **arr);
 char		**last_command(t_list *head);
 int			access_outfile_herdoc(char *path);
 void		initialize(t_quotes *data);

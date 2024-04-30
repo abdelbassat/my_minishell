@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/29 17:19:19 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/30 21:34:51 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,15 @@ void	ft_exec_utils(t_list *head, t_data *data)
 {
 	char	*red;
 
-	red = ft_strtrim((char *)head->content, " ");
+	red = (char *)head->content;
 	if (strcmp(red, ">>") == 0)
 		data->outfile = access_outfile_herdoc((char *)head->next->content);
 	else if (strcmp(red, ">") == 0)
 		data->outfile = access_outfile((char *)head->next->content);
 	else if (strcmp(red, "<") == 0)
 		data->intfile = access_intfile((char *)head->next->content);
+	else if (strcmp(red, "<<") == 0)
+		data->intfile = ft_read_stdin((char *)head->next->content);
 }
 
 void	ft_exec_redic(t_list *head, t_data *data)
@@ -76,6 +78,26 @@ void	ft_exec_redic(t_list *head, t_data *data)
 		if (head)
 			head = head->next;
 	}
+}
+
+int	ft_read_stdin(char *end)
+{
+	char	*buff;
+	int		fd[2];
+
+	buff = NULL;
+	pipe(fd);
+	while (1)
+	{
+		buff = readline("> ");
+		if (!buff || !strcmp(buff, end))
+			break ;
+		write(fd[1], buff, ft_strlen(buff));
+	}
+	if (!buff)
+		printf("bash: warning: here-document at line 1 delimited by end-of-file (wanted `%s')\n",
+			end);
+	return (close(fd[1]), fd[0]);
 }
 
 t_list	*ft_split_rediction(t_list *head, t_list **new)
