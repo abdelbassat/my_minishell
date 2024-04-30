@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/26 16:03:22 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/29 17:19:19 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,46 +52,48 @@ int	access_outfile(char *path)
 	return (fd);
 }
 
-t_list	*ft_redic(char *line)
+void	ft_exec_utils(t_list *head, t_data *data)
 {
-	int		i;
-	t_list	*head;
-	char	*join;
-	int		flag;
-	char	c;
+	char	*red;
 
-	i = 0;
-	head = NULL;
-	join = NULL;
-	flag = 0;
-	while (line[i])
+	red = ft_strtrim((char *)head->content, " ");
+	if (strcmp(red, ">>") == 0)
+		data->outfile = access_outfile_herdoc((char *)head->next->content);
+	else if (strcmp(red, ">") == 0)
+		data->outfile = access_outfile((char *)head->next->content);
+	else if (strcmp(red, "<") == 0)
+		data->intfile = access_intfile((char *)head->next->content);
+}
+
+void	ft_exec_redic(t_list *head, t_data *data)
+{
+	data->outfile = 1;
+	data->intfile = 0;
+	while (head)
 	{
-		if (line[i] == '>' || line[i] == '<')
-			c = line[i];
-		if (line[i] == c)
+		ft_exec_utils(head, data);
+		head = head->next;
+		if (head)
+			head = head->next;
+	}
+}
+
+t_list	*ft_split_rediction(t_list *head, t_list **new)
+{
+	t_list	*tmp;
+
+	tmp = NULL;
+	while (head)
+	{
+		if (head->x == 4 && head->next->x != 4)
 		{
-			if (line[i + 1] == c)
-			{
-				ft_lstadd_back(&head, ft_lstnew(ft_substr(line, i, 2)));
-				i++;
-			}
-			else
-				ft_lstadd_back(&head, ft_lstnew(ft_substr(line, i, 1)));
-			i++;
-			while (line[i] != '<' && line[i] != '>' && line[i])
-			{
-				flag = 1;
-				join = ft_new_strjoin(join, line[i]);
-				i++;
-			}
-			if (flag == 1)
-			{
-				flag = 0;
-				ft_lstadd_back(&head, ft_lstnew(join));
-			}
+			ft_lstadd_back(new, ft_lstnew(ft_strdup((char *)head->content)));
+			head = head->next;
+			ft_lstadd_back(new, ft_lstnew(ft_strdup((char *)head->content)));
 		}
 		else
-			return (NULL);
+			ft_lstadd_back(&tmp, ft_lstnew(ft_strdup((char *)head->content)));
+		head = head->next;
 	}
-	return (head);
+	return (tmp);
 }

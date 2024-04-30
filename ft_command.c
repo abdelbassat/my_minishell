@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/27 20:00:32 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/29 17:20:46 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,8 +44,6 @@ void	ft_display(t_list *ptr)
 	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	while (ptr)
 	{
-		// if (strcmp((char *)ptr->content, "||") != 0
-		// 	&& strcmp((char *)ptr->content, "&&") != 0)
 		printf("%s\n", (char *)ptr->content);
 		printf("%d\n", ptr->x);
 		ptr = ptr->next;
@@ -224,12 +222,24 @@ void	ft_command(char *line, char **env, t_data *data, int fd1, int fd0,
 	char		*cmd;
 	char		**command;
 	t_quotes	dataa;
+	t_list		*command_list;
+	t_list		*head;
+	t_list		*redic;
 
+	command_list = NULL;
+	redic = NULL;
+	head = split_end_or(line, "><", 0);
+	command_list = ft_split_rediction(head, &redic);
+	ft_exec_redic(redic, data);
+	if (data->outfile != 1)
+		fd1 = data->outfile;
+	if (data->intfile)
+		fd0 = data->intfile;
 	if (!ft_strtrim(line, " \n")[0])
 		return ;
 	command = NULL;
 	initialize(&dataa);
-	command = last_command(ft_new_split(line, dataa));
+	command = last_command(command_list);
 	if (strcmp(command[0], "cd") == 0)
 		chdir(command[1]);
 	else

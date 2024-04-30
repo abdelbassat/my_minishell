@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/28 10:26:57 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/29 17:07:34 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@
 
 typedef struct Data
 {
+	int		intfile;
+	int		outfile;
 	int		status;
 	int		fd[2];
 	int		in;
@@ -45,6 +47,8 @@ typedef struct quotes
 	int		cp;
 	int		cq;
 	int		cs;
+	int		en;
+	int		bk;
 }			t_quotes;
 
 typedef struct STR
@@ -54,15 +58,18 @@ typedef struct STR
 	char	c;
 	int		i;
 }			t_str;
-
+void		ft_exec_redic(t_list *head, t_data *data);
+void		ft_nested_pip_syntax(t_list *head, t_data *data);
+t_list		*ft_split_rediction(t_list *head, t_list **new);
 int			ft_check_syntax(t_list *head);
 void		ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
 				int fd0);
 void		ft_print_tree(t_list *head);
-t_list		*ft_split_linked_pip(char *str, char c);
+t_list		*ft_split_linked_pip(char *str, char c, int flag);
 t_list		*ft_nested_pip(char *line, t_data *data);
-t_list		*split_end_or(char *str);
-
+t_list		*split_end_or(char *str, char *set, int flag);
+void		ft_check_syntax_command(t_list *head, t_data *data);
+void		ft_check_string(char *str, t_data *data);
 void		ft_display(t_list *ptr);
 int			access_intfile(char *path);
 int			access_outfile(char *path);

@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/28 16:04:21 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/29 17:12:19 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ int	main(int ac, char **av, char **env)
 	head = NULL;
 	data.status = 0;
 	data.in = 0;
+	data.intfile = 0;
+	data.outfile = 1;
 	data.out = 1;
 	data.exec = 0;
 	data.red = 0;
@@ -39,8 +41,8 @@ int	main(int ac, char **av, char **env)
 		if (!line)
 			return (1);
 		add_history(line);
-		// head = ft_split_linked_pip(line, '|');
-		// ft_display(head);
+		// ft_nested_pip_syntax(head, &data);
+		// ft_check_string(line, &data);
 		head = ft_nested_pip(line, &data);
 		if (data.red == 1)
 		{

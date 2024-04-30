@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:27:06 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/28 16:53:02 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/04/29 18:10:58 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,10 @@ void	ft_check_quotes(char c, t_quotes *data)
 		data->cs++;
 	else if (c == 39 && !data->cq)
 		data->cs--;
+	if (c == '&' && !data->cq && !data->cs && !data->cp)
+		data->en++;
+	if (c == '`' && !data->cq && !data->cs && !data->cp)
+		data->en++;
 }
 
 void	ini_str(t_str *data)
@@ -34,7 +38,7 @@ void	ini_str(t_str *data)
 	data->str2 = NULL;
 }
 
-t_list	*split_end_or(char *str)
+t_list	*split_end_or(char *str, char *set, int check)
 {
 	int			i;
 	t_list		*head;
@@ -52,9 +56,10 @@ t_list	*split_end_or(char *str)
 	while (str[i])
 	{
 		ft_check_quotes(str[i], &data);
-		if (str[i] == '|' || str[i] == '&')
+		if (str[i] == set[0] || str[i] == set[1] || str[i] == ' ')
 			c = str[i];
-		if (str[i] == c && str[i + 1] == c && !data.cp && !data.cq && !data.cs)
+		if (str[i] == c && (check == 0 || str[i + 1] == c) && !data.cp
+			&& !data.cq && !data.cs)
 			flag = 1;
 		else
 			join = ft_new_strjoin(join, str[i]);
@@ -64,11 +69,17 @@ t_list	*split_end_or(char *str)
 				ft_lstadd_back(&head, ft_lstnew(join));
 			if (str[i + 1])
 			{
-				join = ft_new_strjoin(NULL, str[i]);
-				node = ft_lstnew(ft_strjoin(join, join));
+				if (str[i] != ' ')
+					join = ft_new_strjoin(NULL, str[i]);
+				if (str[i + 1] == c && c != ' ')
+				{
+					i++;
+					join = ft_strjoin(join, join);
+				}
+				node = ft_lstnew(join);
 				node->x = 4;
-				ft_lstadd_back(&head, node);
-				i++;
+				if (str[i] != ' ')
+					ft_lstadd_back(&head, node);
 			}
 			join = NULL;
 			flag = 0;
@@ -76,6 +87,22 @@ t_list	*split_end_or(char *str)
 		i++;
 	}
 	return (head);
+}
+
+int	ft_count_qutes(char *str, t_quotes *qutes)
+{
+	int	i;
+
+	i = 0;
+	initialize(qutes);
+	while (str[i])
+	{
+		ft_check_quotes(str[i], qutes);
+		if (qutes->cp == 1)
+			return (1);
+		i++;
+	}
+	return (0);
 }
 
 void	ft_print_tree(t_list *head)
@@ -99,15 +126,16 @@ void	ft_print_tree(t_list *head)
 
 t_list	*ft_nested_pip(char *line, t_data *data)
 {
-	t_list	*head;
-	t_list	*new;
-	t_list	*list;
-	char	*cmd;
+	t_list		*head;
+	t_list		*new;
+	t_list		*list;
+	t_list		*par;
+	t_quotes	qutes;
+	char		*cmd;
+	char		*command;
 
 	new = NULL;
-	head = split_end_or(line);
-	if (ft_check_syntax(head) == 1)
-		data->red = 1;
+	head = split_end_or(line, "|&", 1);
 	if (data->red == 0)
 	{
 		new = head;
@@ -117,19 +145,20 @@ t_list	*ft_nested_pip(char *line, t_data *data)
 			cmd = (char *)head->content;
 			if (!head->x)
 			{
-				list = ft_split_linked_pip(cmd, '|');
-				if (ft_check_syntax(list) == 1)
-					data->red = 1;
+				list = ft_split_linked_pip(cmd, '|', 0);
 				if (data->red == 0)
 				{
 					head->new_list = list;
 					while (list)
 					{
-						if (ft_strchr((char *)list->content, '(') != NULL)
+						command = (char *)list->content;
+						if (ft_count_qutes(command, &qutes) == 1)
 						{
+							par = ft_split_linked_pip(command, ' ', 1);
+							par->content = ft_strtrim((char *)par->content, " ");
 							list->x = 1;
-							list->content = ft_strtrim((char *)list->content,
-									"() ");
+							list->content = ft_substr(par->content, 1,
+									ft_strlen(par->content) - 2);
 							list->new_list = ft_nested_pip((char *)list->content,
 									data);
 						}
@@ -147,14 +176,17 @@ t_list	*ft_nested_pip(char *line, t_data *data)
 
 void	check_eo(t_list *head, t_data *data, int fd1, int fd0)
 {
-	if (strcmp((char *)head->content, "&&") == 0)
+	char	*op;
+
+	op = ft_strtrim((char *)head->content, " ");
+	if (strcmp(op, "&&") == 0)
 	{
 		if (data->status == 0)
 			data->exec = 0;
 		else
 			data->exec = 1;
 	}
-	else if (strcmp((char *)head->content, "||") == 0)
+	else if (strcmp(op, "||") == 0)
 	{
 		if (data->status != 0)
 			data->exec = 0;
@@ -173,6 +205,7 @@ void	wait_proccess(t_data *data)
 	int	status;
 	int	tmp;
 
+	// problem in command not found
 	while (1)
 	{
 		status = wait(&tmp);
@@ -214,7 +247,7 @@ void	ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
 		{
 			while (head->new_list)
 			{
-				if (head->new_list->x == 0)
+				if (head->new_list->x != 4)
 				{
 					if (head->new_list->next != NULL)
 					{
@@ -253,6 +286,56 @@ void	ft_nested_pip_ex(t_list *head, char **env, t_data *data, int fd1,
 			}
 			wait_proccess(data);
 		}
+		head = head->next;
+	}
+}
+
+void	ft_nested_pip_syntax(t_list *head, t_data *data)
+{
+	if (ft_check_syntax(head) == 1)
+		data->red = 1;
+	while (head && !data->red)
+	{
+		if (ft_check_syntax(head->new_list) == 1)
+			data->red = 1;
+		while (head->new_list && !data->red)
+		{
+			if (head->new_list->x != 4)
+			{
+				if (head->new_list->x == 1)
+					ft_nested_pip_syntax(head->new_list->new_list, data);
+			}
+			head->new_list = head->new_list->next;
+		}
+		head = head->next;
+	}
+}
+
+//////////////////check syntax ////////////////////
+
+void	ft_check_string(char *str, t_data *data)
+{
+	int			i;
+	t_quotes	qutes;
+
+	i = 0;
+	initialize(&qutes);
+	while (str[i])
+	{
+		ft_check_quotes(str[i], &qutes);
+		i++;
+	}
+	if (qutes.cp || qutes.cq || qutes.cs || (qutes.en % 2) || (qutes.bk % 2))
+		data->red = 1;
+}
+
+void	ft_check_syntax_command(t_list *head, t_data *data)
+{
+	while (head)
+	{
+		ft_check_string((char *)head->content, data);
+		if (data->red == 1)
+			break ;
 		head = head->next;
 	}
 }
