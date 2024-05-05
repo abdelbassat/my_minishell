@@ -6,68 +6,11 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/30 21:36:29 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/05 01:47:26 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
-
-char	*ft_check_command(char *command)
-{
-	char	*env_path;
-	char	*path;
-	char	*cmd;
-	char	**bins;
-	int		i;
-
-	if (command[0] == 0)
-		return (NULL);
-	env_path = getenv("PATH");
-	bins = ft_split(env_path, ':');
-	i = 0;
-	while (bins[i])
-	{
-		path = ft_strjoin(bins[i], "/");
-		cmd = ft_strjoin(path, command);
-		if (access(cmd, F_OK) == 0)
-			return (ft_free(bins), free(path), cmd);
-		free(path);
-		free(cmd);
-		i++;
-	}
-	ft_free(bins);
-	return (NULL);
-}
-
-void	ft_display(t_list *ptr)
-{
-	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-	while (ptr)
-	{
-		printf("%s\n", (char *)ptr->content);
-		ptr = ptr->next;
-	}
-	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-}
-
-char	**create_command(t_list *head)
-{
-	int		i;
-	int		size;
-	char	**command;
-
-	i = 0;
-	size = ft_lstsize(head) + 1;
-	command = (char **)malloc(sizeof(char *) * size);
-	while (head)
-	{
-		command[i] = ft_strdup((char *)head->content);
-		i++;
-		head = head->next;
-	}
-	command[i] = NULL;
-	return (command);
-}
 
 char	*ft_new_strjoin(char *str, char c)
 {
@@ -111,12 +54,13 @@ char	*ft_remove(char *str)
 		if (str[i] == c)
 		{
 			if (str[i + 1] == c)
-				join = ft_new_strjoin(join, 0);
-			else
 			{
+				join = ft_new_strjoin(join, 0);
+				i++;
+			}
+			else
 				while (str[++i] != c)
 					join = ft_new_strjoin(join, str[i]);
-			}
 		}
 		else
 			join = ft_new_strjoin(join, str[i]);
@@ -139,8 +83,6 @@ char	**last_command(t_list *head)
 	while (head)
 	{
 		arr[i] = ft_remove((char *)head->content);
-		if (arr[i] == NULL)
-			return (NULL);
 		i++;
 		head = head->next;
 	}
@@ -148,21 +90,16 @@ char	**last_command(t_list *head)
 	return (arr);
 }
 
-void	ft_handel_redic(char *line, t_list **command_list, t_list **redic,
-		t_data *data)
+void	ft_handel_redic(t_list **redic, t_data *data, int flag)
 {
-	t_list	*head;
-
-	head = split_end_or(line, ">< ", 0);
-	*command_list = ft_split_rediction(head, redic);
-	ft_exec_redic(*redic, data);
+	ft_exec_redic(*redic, data, flag);
+	if (data->intfile != 0)
+		data->in = data->intfile;
 	if (data->outfile != 1)
 		data->out = data->outfile;
-	if (data->intfile)
-		data->in = data->intfile;
 }
 
-void	ft_exec_command(char *cmd, char **command, t_data *data)
+void	ft_exec_command(char *cmd, char **command, t_data *data, int cls)
 {
 	if (data->in != STDIN_FILENO)
 	{
@@ -172,41 +109,35 @@ void	ft_exec_command(char *cmd, char **command, t_data *data)
 	if (data->out != STDOUT_FILENO)
 	{
 		dup2(data->out, STDOUT_FILENO);
-		close(data->fd[0]);
+		close(cls);
 		close(data->out);
 	}
 	execve(cmd, command, data->env);
-	perror("execve failing");
+	printf("minishell: command not found: %s\n", cmd);
+	data->status = 127;
 }
 
-void	ft_command(char *line, t_data *data)
+void	ft_command(t_list *head, t_data *data, int cls)
 {
 	char	*cmd;
 	char	**command;
-	t_list	*command_list;
-	t_list	*redic;
 
-	command_list = NULL;
-	redic = NULL;
-	ft_handel_redic(line, &command_list, &redic, data);
-	if (!command_list)
+	ft_handel_redic(&head->redic, data, 1);
+	if (data->in == -1 || data->out == -1)
 		return ;
-	command = last_command(command_list);
-	cmd = ft_check_command(command[0]);
-	if (cmd)
+	if (head->int_file == 0)
 	{
-		data->pid = fork();
-		if (data->pid == 0)
-			ft_exec_command(cmd, command, data);
+		if (head->in)
+		{
+			data->in = head->in;
+			head->in = 0;
+		}
 	}
-	else
-	{
-		data->status = 127;
-		printf("Command '%s' not found.\n", command[0]);
-	}
-	if (data->intfile != 0)
-		close(data->intfile);
+	command = last_command(head->command);
+	cmd = ft_check_command(command[0], data);
+	data->pid = fork();
+	if (data->pid == 0)
+		ft_exec_command(cmd, command, data, cls);
+	free(cmd);
 	ft_free(command);
-	ft_lstclear(&command_list, free);
-	ft_lstclear(&redic, free);
 }

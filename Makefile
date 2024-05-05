@@ -1,3 +1,6 @@
+
+#error ls (wc << a) | ls
+
 NAME = minishell
 
 SRC = $(wildcard *.c)
@@ -7,10 +10,10 @@ OBJECTS_LIBFT = $(SRC_libft:.c=.o)
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror  #-fsanitize=address #-no-pie
+CFLAGS = -Wall -Wextra -Werror  #-g3 -fsanitize=address #-no-pie
 
 all: $(NAME) 
-	@rm -rf *.o
+	@rm -rf *.o libft/*.o
 $(NAME): $(OBJECTS)  $(OBJECTS_LIBFT)
 	@$(CC) $(CFLAGS) $(OBJECTS)  $(OBJECTS_LIBFT) $(libft) -lreadline  -o $(NAME)
 
@@ -18,7 +21,7 @@ $(NAME): $(OBJECTS)  $(OBJECTS_LIBFT)
 	@$(CC) $(CFLAGS) -c -o $@ $< 
 
 clean:
-	@rm -f   $(OBJECTS)  $(OBJECTS_LIBFT) && rm -rf *.o > /dev/null
+	@ rm -rf *.o  libft/*.o > /dev/null
 fclean: clean
 	@rm -rf ./minishell
 

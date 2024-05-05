@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 03:28:31 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/04/30 14:20:14 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/04 18:01:34 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,20 +41,31 @@ char	*ft_pwd(int flag)
 {
 	char	*buff;
 	char	*path;
+	char	*save;
 	char	*arrow;
 
-	buff = malloc(100);
-	getcwd(buff, 100);
+	buff = malloc(4000);
+	getcwd(buff, 4000);
 	path = ft_strjoin(&ft_strrchr(buff, '/')[1], " ");
 	if (flag == 0)
 	{
 		arrow = ft_strjoin("\e[1;32m", "\u2794");
+		save = arrow;
 		arrow = ft_strjoin(arrow, " ");
-		arrow = ft_strjoin(arrow, "\033[0m");
+		free(save);
+		save = arrow;
 		arrow = ft_strjoin(arrow, "\e[1;33m");
+		free(save);
+		save = path;
 		path = ft_strjoin(arrow, path);
+		free(arrow);
+		free(save);
+		save = path;
 		path = ft_strjoin(path, "\033[0m");
+		free(save);
+		save = path;
 		path = ft_strjoin("\033[0;37m", path);
+		free(save);
 	}
 	else
 		printf("%s\n", buff);
