@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 01:47:26 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/05 21:06:29 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,6 @@ void	ft_exec_command(char *cmd, char **command, t_data *data, int cls)
 		close(data->out);
 	}
 	execve(cmd, command, data->env);
-	printf("minishell: command not found: %s\n", cmd);
-	data->status = 127;
 }
 
 void	ft_command(t_list *head, t_data *data, int cls)
@@ -123,21 +121,27 @@ void	ft_command(t_list *head, t_data *data, int cls)
 	char	**command;
 
 	ft_handel_redic(&head->redic, data, 1);
-	if (data->in == -1 || data->out == -1)
+	// printf("%d\n" , head->int_file);
+	// problem here
+	if (head->int_file)
+		data->in = head->in;
+	////////
+	if (data->in == -1 || data->out == -1 || !head->command)
 		return ;
-	if (head->int_file == 0)
-	{
-		if (head->in)
-		{
-			data->in = head->in;
-			head->in = 0;
-		}
-	}
 	command = last_command(head->command);
 	cmd = ft_check_command(command[0], data);
-	data->pid = fork();
-	if (data->pid == 0)
-		ft_exec_command(cmd, command, data, cls);
+	if (data->check_Cmd)
+	{
+		printf("minishell: command not found: %s\n", cmd);
+		data->check_Cmd = 0;
+		data->status = 127;
+	}
+	else
+	{
+		data->pid = fork();
+		if (data->pid == 0)
+			ft_exec_command(cmd, command, data, cls);
+	}
 	free(cmd);
 	ft_free(command);
 }

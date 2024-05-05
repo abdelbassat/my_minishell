@@ -6,18 +6,109 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:27:06 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 01:49:14 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/05 21:02:17 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
+int	ft_math(int i)
+{
+	int	number;
+
+	number = 1;
+	while (i)
+	{
+		number *= 2;
+		i--;
+	}
+	return (number);
+}
+
+char	ft_reverse(char *str)
+{
+	int	number;
+	int	i;
+
+	number = 0;
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '1')
+			number += ft_math(i);
+		i++;
+	}
+	return (number + 65);
+}
+
+char	*ft_revers_to_base64(char *str)
+{
+	char	*join;
+	int		i;
+
+	join = NULL;
+	i = 0;
+	while (str[i])
+	{
+		join = ft_new_strjoin(join, ft_reverse(ft_substr(str, i, 6)));
+		i += 6;
+	}
+	return (join);
+}
+
+char	*ft_convert(int c)
+{
+	int		number;
+	char	*str;
+	int		i;
+	int		b;
+	int		j;
+
+	j = 0;
+	str = malloc(9);
+	i = 0;
+	number = c;
+	while (c)
+	{
+		c /= 2;
+		i++;
+	}
+	while (i < 8)
+	{
+		str[j] = 48;
+		j++;
+		i++;
+	}
+	while (number)
+	{
+		b = number % 2;
+		str[j] = b + 48;
+		number /= 2;
+		j++;
+	}
+	str[j] = 0;
+	return (str);
+}
+
+char	*ft_base64(char *str)
+{
+	int		i;
+	char	*join;
+
+	join = NULL;
+	i = 0;
+	while (str[i])
+	{
+		join = ft_strjoin(join, ft_convert((int)str[i]));
+		i++;
+	}
+	return (join);
+}
+
 char	*join_command(t_list *head)
 {
 	char	*join;
-	t_list	*tmp;
 
-	tmp = head;
 	join = NULL;
 	while (head)
 	{
@@ -54,7 +145,7 @@ void	ft_free_tree(t_list *head)
 	ft_lstclear(&tmp, free);
 }
 
-void	ft_nested(t_list **head, t_data *data)
+void	ft_nested(t_list *head, t_data *data)
 {
 	char		*cmd;
 	char		*save;
@@ -62,18 +153,21 @@ void	ft_nested(t_list **head, t_data *data)
 	t_list		*list;
 
 	save = NULL;
-	list = *head;
+	list = head;
 	ft_split_rediction(list->content, &(list));
 	cmd = join_command(list->command);
-	if (ft_count_qutes(cmd, &qutes) == 1)
+	if (cmd)
 	{
-		list->x = 1;
-		save = cmd;
-		cmd = ft_substr(cmd, 1, ft_strlen(cmd) - 2);
-		free(save);
-		save = cmd;
-		list->new_list = ft_nested_pip(cmd, data);
-		free(save);
+		if (ft_count_qutes(cmd, &qutes) == 1)
+		{
+			list->x = 1;
+			save = cmd;
+			cmd = ft_substr(cmd, 1, ft_strlen(cmd) - 2);
+			free(save);
+			save = cmd;
+			list->new_list = ft_nested_pip(cmd, data);
+			free(save);
+		}
 	}
 	ft_handel_redic(&(list->here_doc), data, 0);
 	list->in = data->in;
@@ -96,7 +190,7 @@ t_list	*ft_nested_pip(char *line, t_data *data)
 			while (list)
 			{
 				if (list->x != 4)
-					ft_nested(&list, data);
+					ft_nested(list, data);
 				list = list->next;
 			}
 		}

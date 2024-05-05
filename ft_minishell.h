@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 01:43:59 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/05 20:26:23 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,11 @@ typedef struct STR
 	int		i;
 	int		flag;
 }			t_str;
+
+char		*ft_revers_to_base64(char *str);
+char		ft_reverse(char *str);
+char		*ft_base64(char *str);
+char		*ft_convert(int c);
 void		free_list(t_free *head, int flag);
 int			ft_count_qutes(char *line, t_quotes *qutes);
 void		ft_handel_redic(t_list **redic, t_data *data, int flag);
@@ -103,7 +108,7 @@ int			access_outfile_herdoc(char *path);
 void		initialize(t_quotes *data);
 char		*ft_new_strjoin(char *str, char c);
 
-void		close_fd(t_list *head, t_data *data, int fd0);
+void		close_fd(t_list **tmp, t_data *data, int fd0);
 void		check_eo(t_list *head, t_data *data, int fd1, int fd0);
 void		wait_proccess(t_data *data, int proc);
 #endif

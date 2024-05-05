@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 01:03:49 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/05 20:55:51 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,7 @@ int	main(int ac, char **av, char **env)
 		add_history(line);
 		if (!line)
 			exit(1);
-		head = NULL;
-		ft_syntax(line, &data);
+		// ft_syntax(line, &data);
 		if (data.red == 1)
 		{
 			printf("minishell: syntax error near unexpected token\n");

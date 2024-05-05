@@ -1,5 +1,9 @@
 
 #error ls (wc << a) | ls
+#error (wc << a) | cat
+# cat -e < q
+
+
 
 NAME = minishell
 

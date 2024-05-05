@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 01:40:51 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/05 20:09:32 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,13 @@ int	ft_read_stdin(char *end)
 {
 	char	*buff;
 	int		fd;
+	char	*file;
 
-	buff = NULL;
-	fd = open("/tmp/b", O_CREAT | O_RDWR, 0644);
+	buff = malloc(6);
+	read(open("/dev/random", O_RDONLY), buff, 5);
+	buff[5] = 0;
+	file = ft_strjoin("/tmp/.", ft_revers_to_base64(ft_base64(buff)));
+	fd = open(file, O_CREAT | O_RDWR, 0644);
 	while (1)
 	{
 		buff = readline("> ");
@@ -69,7 +73,7 @@ int	ft_read_stdin(char *end)
 		printf("bash: warning: here-document at line 1 delimited by end-of-file (wanted `%s')\n",
 			end);
 	close(fd);
-	fd = open("/tmp/b", O_CREAT | O_RDWR, 0644);
+	fd = open(file, O_CREAT | O_RDWR, 0644);
 	return (fd);
 }
 
@@ -77,7 +81,6 @@ void	ft_split_rediction(char *line, t_list **command)
 {
 	t_list	*head;
 	t_list	*tmp;
-	t_list	*node;
 
 	head = split_end_or(line, ">< ", 0);
 	tmp = head;
@@ -86,12 +89,20 @@ void	ft_split_rediction(char *line, t_list **command)
 		if (head->x == 4 && head->next->x != 4)
 		{
 			if (strcmp(head->content, "<<") == 0)
-				node = (*command)->here_doc;
+			{
+				(*command)->int_file = 0;
+				ft_lstnew_back(&((*command)->here_doc), head->content, 0);
+				head = head->next;
+				ft_lstnew_back(&((*command)->here_doc), head->content, 4);
+			}
 			else
-				node = (*command)->redic;
-			ft_lstnew_back(&((*command)->redic), head->content, 0);
-			head = head->next;
-			ft_lstnew_back(&((*command)->redic), head->content, 4);
+			{
+				if (!strcmp(head->content, "<"))
+					(*command)->int_file = 1;
+				ft_lstnew_back(&((*command)->redic), head->content, 0);
+				head = head->next;
+				ft_lstnew_back(&((*command)->redic), head->content, 4);
+			}
 		}
 		else
 			ft_lstnew_back(&(*command)->command, head->content, 0);
