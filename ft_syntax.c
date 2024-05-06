@@ -6,32 +6,45 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:49:51 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 17:56:26 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/06 20:56:50 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-void	ft_nested_syntax(t_list **head, t_data *data)
+void	ft_free_list_node(t_list **head)
+{
+	ft_lstclear(&((*head)->command), free);
+	ft_lstclear(&((*head)->redic), free);
+	ft_lstclear(&((*head)->here_doc), free);
+}
+
+void	ft_nested_syntax(t_list **head, t_data *data, int *flag)
 {
 	char		*cmd;
 	char		*save;
 	t_quotes	qutes;
 	t_list		*list;
+	t_list		*ss;
 
 	save = NULL;
 	list = *head;
-	ft_split_rediction(list->content, &(list));
+	ss = split_end_or(list->content, "<> ", 0);
+	*flag = ft_check_syntax(ss, 1337);
+	if (!(*flag))
+		ft_split_rediction(list->content, &(list));
 	cmd = join_command(list->command);
-	ft_check_string(cmd, data);
-	if (ft_count_qutes(cmd, &qutes) == 1 && !data->red)
+	if (cmd && !data->red)
 	{
-		save = cmd;
-		cmd = ft_substr(cmd, 1, ft_strlen(cmd) - 2);
-		free(save);
-		save = cmd;
-		ft_syntax(cmd, data);
-		free(save);
+		ft_check_string(cmd, data);
+		if (ft_count_qutes(cmd, &qutes) == 1 && !data->red)
+		{
+			save = cmd;
+			cmd = ft_substr(cmd, 1, ft_strlen(cmd) - 2);
+			free(save);
+			ft_syntax(cmd, data);
+		}
+		free(cmd);
 	}
 }
 
@@ -55,7 +68,8 @@ void	ft_syntax(char *line, t_data *data)
 			while (list && !data->red)
 			{
 				if (list->x != 4)
-					ft_nested_syntax(&list, data);
+					ft_nested_syntax(&list, data, &data->red);
+				ft_free_list_node(&list);
 				list = list->next;
 			}
 			free_list(&free_data, 0);
@@ -67,17 +81,37 @@ void	ft_syntax(char *line, t_data *data)
 
 int	ft_check_syntax(t_list *head, int flag)
 {
-	int	i;
+	int			i;
+	t_list		*tmp;
+	int			value;
+	int			j;
+	t_quotes	qutes;
+	int			save;
 
+	value = 0;
 	i = 0;
+	tmp = head;
 	while (head)
 	{
-		if (head->x == 4 && (!head->next || head->next->x == 4 || i == flag))
-			return (1);
+		if ((head->x == 4 || head->x == 2) && (!head->next
+				|| (head->next->x == 4 || head->next->x == 2) || i == 1337
+				|| ((head->x == 2) && (ft_count_qutes(head->next->content,
+							&qutes)))))
+			value = 1;
+		else if (!strcmp(tmp->content, "<<"))
+			save = 1;
 		head = head->next;
 		i++;
 	}
-	return (0);
+	j = 0;
+	while (tmp && value == 1)
+	{
+		if (!strcmp(tmp->content, "<<") && tmp->next && flag == 1337 && j < i)
+			ft_read_stdin(tmp->next->content);
+		j++;
+		tmp = tmp->next;
+	}
+	return (value);
 }
 
 void	ft_check_string(char *line, t_data *data)

@@ -14,7 +14,7 @@ OBJECTS_LIBFT = $(SRC_libft:.c=.o)
 
 CC = cc
 
-CFLAGS = -Wall -Wextra -Werror  #-g3 -fsanitize=address #-no-pie
+CFLAGS = -Wall -Wextra -Werror  -g3 -fsanitize=address #-no-pie
 
 all: $(NAME) 
 	@rm -rf *.o libft/*.o

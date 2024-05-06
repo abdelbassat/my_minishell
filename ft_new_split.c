@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:59:46 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 17:42:28 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/06 20:53:27 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	ft_lstnew_back(t_list **head, char *cont, int flag)
 	t_list	*node;
 
 	node = ft_lstnew(cont);
-	if (((char *)node->content)[0])
+	if (node->content[0])
 	{
 		node->x = flag;
 		ft_lstadd_back(head, node);
@@ -70,8 +70,11 @@ void	ft_check_quotes(char c, t_quotes *data)
 		data->en++;
 }
 
-void	utils_split(t_str *strr, t_list **head, int *i)
+void	utils_split(t_str *strr, t_list **head, int *i, int flag)
 {
+	char	*save;
+
+	save = NULL;
 	if (strr->join)
 	{
 		ft_lstnew_back(head, strr->join, 0);
@@ -84,11 +87,13 @@ void	utils_split(t_str *strr, t_list **head, int *i)
 		if (strr->str[*i + 1] == strr->c && strr->c != ' ')
 		{
 			*i = *i + 1;
+			save = strr->join;
 			strr->join = ft_strjoin(strr->join, strr->join);
+			free(save);
 		}
-		if (strr->c != ' ')
+		if (strr->str[*i] != ' ')
 		{
-			ft_lstnew_back(head, strr->join, 4);
+			ft_lstnew_back(head, strr->join, flag);
 			free(strr->join);
 		}
 	}
@@ -102,12 +107,16 @@ t_list	*split_end_or(char *line, char *set, int check)
 	t_list		*head;
 	t_quotes	data;
 	t_str		strr;
+	int			ff;
 
 	head = NULL;
 	i = 0;
 	ini_str(&strr);
 	initialize(&data);
 	strr.str = line;
+	ff = 4;
+	if (!strcmp(set, "<> "))
+		ff = 2;
 	while (line[i])
 	{
 		ft_check_quotes(line[i], &data);
@@ -118,7 +127,7 @@ t_list	*split_end_or(char *line, char *set, int check)
 		else
 			strr.join = ft_new_strjoin(strr.join, line[i]);
 		if (strr.flag == 1 || !line[i + 1])
-			utils_split(&strr, &head, &i);
+			utils_split(&strr, &head, &i, ff);
 		i++;
 	}
 	return (head);

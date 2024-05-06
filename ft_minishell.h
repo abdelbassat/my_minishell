@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 20:26:23 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/06 16:04:49 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ void		ft_check_string(char *str, t_data *data);
 void		ft_display(t_list *ptr);
 int			access_intfile(char *path);
 int			access_outfile(char *path);
+void		ft_free_list_node(t_list **head);
+void		ft_free_trees(t_list **head);
 void		red(void);
 void		cyan(void);
 void		yellow(void);

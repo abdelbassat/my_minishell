@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 21:06:29 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/06 13:40:55 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,13 @@ char	*ft_remove(char *str)
 				i++;
 			}
 			else
-				while (str[++i] != c)
+			{
+				while (str[i] != c)
+				{
+					i++;
 					join = ft_new_strjoin(join, str[i]);
+				}
+			}
 		}
 		else
 			join = ft_new_strjoin(join, str[i]);
@@ -82,7 +87,7 @@ char	**last_command(t_list *head)
 	arr = malloc(sizeof(char *) * (size + 1));
 	while (head)
 	{
-		arr[i] = ft_remove((char *)head->content);
+		arr[i] = ft_remove(head->content);
 		i++;
 		head = head->next;
 	}
@@ -121,11 +126,8 @@ void	ft_command(t_list *head, t_data *data, int cls)
 	char	**command;
 
 	ft_handel_redic(&head->redic, data, 1);
-	// printf("%d\n" , head->int_file);
-	// problem here
-	if (head->int_file)
+	if (head->int_file == 2)
 		data->in = head->in;
-	////////
 	if (data->in == -1 || data->out == -1 || !head->command)
 		return ;
 	command = last_command(head->command);

@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:27:06 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 21:02:17 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/06 16:34:30 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,14 +161,11 @@ void	ft_nested(t_list *head, t_data *data)
 		if (ft_count_qutes(cmd, &qutes) == 1)
 		{
 			list->x = 1;
-			save = cmd;
-			cmd = ft_substr(cmd, 1, ft_strlen(cmd) - 2);
-			free(save);
-			save = cmd;
-			list->new_list = ft_nested_pip(cmd, data);
-			free(save);
+			save = ft_substr(cmd, 1, ft_strlen(cmd) - 2);
+			list->new_list = ft_nested_pip(save, data);
 		}
 	}
+	free(cmd);
 	ft_handel_redic(&(list->here_doc), data, 0);
 	list->in = data->in;
 }

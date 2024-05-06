@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 20:55:51 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/06 20:28:15 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	main(int ac, char **av, char **env)
 	t_data	data;
 	t_list	*head;
 	char	*save;
+	int		i;
 
 	line = NULL;
 	printf("PID %d\n", getpid());
@@ -36,8 +37,10 @@ int	main(int ac, char **av, char **env)
 	(void)env;
 	if (ac != 1)
 		return (1);
+	i = 0;
 	while (1)
 	{
+		i++;
 		line = ft_pwd(0);
 		save = line;
 		line = readline(line);
@@ -45,7 +48,7 @@ int	main(int ac, char **av, char **env)
 		add_history(line);
 		if (!line)
 			exit(1);
-		// ft_syntax(line, &data);
+		ft_syntax(line, &data);
 		if (data.red == 1)
 		{
 			printf("minishell: syntax error near unexpected token\n");
@@ -54,12 +57,32 @@ int	main(int ac, char **av, char **env)
 		else
 		{
 			head = ft_nested_pip(line, &data);
-			// ft_free_tree(head);
 			ft_nested_pip_ex(head, &data, STDOUT_FILENO, STDIN_FILENO);
+			ft_lstclear(&head, free);
 			data.in = 0;
 			data.out = 1;
 		}
 		data.status = 0;
 	}
 	return (0);
+}
+
+void	ft_free_trees(t_list **head)
+{
+	t_list	*tmp_list;
+
+	while ((*head))
+	{
+		tmp_list = (*head)->new_list;
+		while ((*head)->new_list)
+		{
+			if ((*head)->new_list->x == 1)
+				ft_free_trees((&(*head)->new_list->new_list));
+			else
+				ft_free_list_node(&((*head)->new_list));
+			(*head)->new_list = (*head)->new_list->next;
+		}
+		ft_lstclear(&tmp_list, free);
+		(*head) = (*head)->next;
+	}
 }

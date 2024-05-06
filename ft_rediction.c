@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 20:09:32 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/06 18:58:45 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,13 +54,10 @@ int	ft_read_stdin(char *end)
 {
 	char	*buff;
 	int		fd;
-	char	*file;
 
-	buff = malloc(6);
-	read(open("/dev/random", O_RDONLY), buff, 5);
-	buff[5] = 0;
-	file = ft_strjoin("/tmp/.", ft_revers_to_base64(ft_base64(buff)));
-	fd = open(file, O_CREAT | O_RDWR, 0644);
+	// char	*file;
+	// file = ft_strjoin("/tmp/.", ft_revers_to_base64(ft_base64(end)));
+	fd = open("a", O_CREAT | O_RDWR, 0644);
 	while (1)
 	{
 		buff = readline("> ");
@@ -73,7 +70,7 @@ int	ft_read_stdin(char *end)
 		printf("bash: warning: here-document at line 1 delimited by end-of-file (wanted `%s')\n",
 			end);
 	close(fd);
-	fd = open(file, O_CREAT | O_RDWR, 0644);
+	fd = open("a", O_CREAT | O_RDWR, 0644);
 	return (fd);
 }
 
@@ -90,7 +87,7 @@ void	ft_split_rediction(char *line, t_list **command)
 		{
 			if (strcmp(head->content, "<<") == 0)
 			{
-				(*command)->int_file = 0;
+				(*command)->int_file = 2;
 				ft_lstnew_back(&((*command)->here_doc), head->content, 0);
 				head = head->next;
 				ft_lstnew_back(&((*command)->here_doc), head->content, 4);
