@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/06 20:28:15 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/07 18:08:08 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,10 @@ int	main(int ac, char **av, char **env)
 	int		i;
 
 	line = NULL;
-	printf("PID %d\n", getpid());
+	// printf("PID %d\n", getpid());
 	(signal(SIGTERM, SIG_IGN));
 	head = NULL;
+	data.env_list = NULL;
 	data.status = 0;
 	data.in = 0;
 	data.intfile = 0;
@@ -33,8 +34,8 @@ int	main(int ac, char **av, char **env)
 	data.red = 0;
 	data.check_Cmd = 0;
 	data.env = env;
+	ft_buffer_to_list(&data.env_list, env);
 	(void)av;
-	(void)env;
 	if (ac != 1)
 		return (1);
 	i = 0;
@@ -51,7 +52,7 @@ int	main(int ac, char **av, char **env)
 		ft_syntax(line, &data);
 		if (data.red == 1)
 		{
-			printf("minishell: syntax error near unexpected token\n");
+			ft_putstr_fd("minishell: syntax error near unexpected token\n", 2);
 			data.red = 0;
 		}
 		else
@@ -62,7 +63,7 @@ int	main(int ac, char **av, char **env)
 			data.in = 0;
 			data.out = 1;
 		}
-		data.status = 0;
+		// data.status = 0;
 	}
 	return (0);
 }

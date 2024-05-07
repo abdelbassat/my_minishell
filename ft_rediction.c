@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/06 18:58:45 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/07 09:34:49 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,6 @@ int	ft_read_stdin(char *end)
 	char	*buff;
 	int		fd;
 
-	// char	*file;
-	// file = ft_strjoin("/tmp/.", ft_revers_to_base64(ft_base64(end)));
 	fd = open("a", O_CREAT | O_RDWR, 0644);
 	while (1)
 	{
@@ -67,7 +65,7 @@ int	ft_read_stdin(char *end)
 		write(fd, "\n", 1);
 	}
 	if (!buff)
-		printf("bash: warning: here-document at line 1 delimited by end-of-file (wanted `%s')\n",
+		printf("minishell: warning: here-document at line 1 delimited by end-of-file (wanted `%s')\n",
 			end);
 	close(fd);
 	fd = open("a", O_CREAT | O_RDWR, 0644);

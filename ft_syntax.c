@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:49:51 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/06 20:56:50 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/07 11:39:32 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	ft_nested_syntax(t_list **head, t_data *data, int *flag)
 	save = NULL;
 	list = *head;
 	ss = split_end_or(list->content, "<> ", 0);
-	*flag = ft_check_syntax(ss, 1337);
+	*flag = ft_check_syntax(ss, 2);
 	if (!(*flag))
 		ft_split_rediction(list->content, &(list));
 	cmd = join_command(list->command);
@@ -56,14 +56,14 @@ void	ft_syntax(char *line, t_data *data)
 
 	head = split_end_or(line, "|&", 1);
 	free_data.head = head;
-	data->red = ft_check_syntax(head, 0);
+	data->red = ft_check_syntax(head, 4);
 	while (head && !data->red)
 	{
 		if (head->x != 4)
 		{
 			list = split_end_or(head->content, "|", 0);
 			free_data.new_list = list;
-			data->red = ft_check_syntax(list, 0);
+			data->red = ft_check_syntax(list, 4);
 			head->new_list = list;
 			while (list && !data->red)
 			{
@@ -77,6 +77,8 @@ void	ft_syntax(char *line, t_data *data)
 		head = head->next;
 	}
 	free_list(&free_data, 3);
+	if (data->red == 1)
+		data->status = 2;
 }
 
 int	ft_check_syntax(t_list *head, int flag)
@@ -90,23 +92,23 @@ int	ft_check_syntax(t_list *head, int flag)
 
 	value = 0;
 	i = 0;
+	save = 0;
 	tmp = head;
-	while (head)
+	while (head && !value)
 	{
-		if ((head->x == 4 || head->x == 2) && (!head->next
-				|| (head->next->x == 4 || head->next->x == 2) || i == 1337
-				|| ((head->x == 2) && (ft_count_qutes(head->next->content,
-							&qutes)))))
-			value = 1;
-		else if (!strcmp(tmp->content, "<<"))
+		if (head->x == 2)
 			save = 1;
+		if (head->x == flag && (!head->next || head->next->x == flag))
+			value = 1;
+		if (save && ft_count_qutes(head->content, &qutes))
+			value = 1;
 		head = head->next;
 		i++;
 	}
 	j = 0;
 	while (tmp && value == 1)
 	{
-		if (!strcmp(tmp->content, "<<") && tmp->next && flag == 1337 && j < i)
+		if (!strcmp(tmp->content, "<<") && tmp->next && flag == 2 && j < i)
 			ft_read_stdin(tmp->next->content);
 		j++;
 		tmp = tmp->next;
