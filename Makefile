@@ -7,8 +7,7 @@ OBJECTS_LIBFT = $(SRC_libft:.c=.o)
 
 CC = cc
 
-# CFLAGS = -Wall -Wextra -Werror  -g3 #-fsanitize=address #-no-pie
-CFLAGS = -Wall -Wextra -Werror  -g3  #-fsanitize=address #-no-pie
+CFLAGS = -Wall -Wextra -Werror  #-g3  -fsanitize=address #-no-pie
 
 all: $(NAME) 
 	@rm -rf *.o
@@ -28,4 +27,4 @@ run:all
 	python3 -m c_formatter_42 *.c && clear && ./minishell
 .PHONY: all clean  fclean re bonus
 
-.SECONDARY: $(OBJECTS)  $(OBJECTS_LIBFT)
+.SECONDARY: 

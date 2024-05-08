@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/07 18:10:43 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:10:07 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include "libft/libft.h"
 # include <dirent.h>
+# include <errno.h>
 # include <fcntl.h>
 # include <libgen.h>
 # include <limits.h>
@@ -27,6 +28,9 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
+
+extern int	errno;
+
 typedef struct freee
 {
 	t_list	*head;
@@ -35,7 +39,6 @@ typedef struct freee
 
 typedef struct Data
 {
-	t_list	*env_list;
 	int		check_Cmd;
 	int		intfile;
 	int		outfile;
@@ -49,6 +52,7 @@ typedef struct Data
 	int		pid;
 	char	**env;
 	int		exec;
+	t_list	*env_list;
 	int		t;
 }			t_data;
 
@@ -71,7 +75,6 @@ typedef struct STR
 }			t_str;
 
 void		ft_buffer_to_list(t_list **head, char **command);
-int			ft_handel_satatus_code(int n);
 char		*ft_revers_to_base64(char *str);
 char		ft_reverse(char *str);
 char		*ft_base64(char *str);
@@ -109,7 +112,7 @@ void		ft_syntax(char *line, t_data *data);
 char		*join_command(t_list *head);
 int			ft_read_stdin(char *end);
 void		ft_free(char **str);
-char		*ft_check_command(char *command, t_data *data);
+char		*ft_check_command(char *command);
 char		**last_command(t_list *head);
 int			access_outfile_herdoc(char *path);
 void		initialize(t_quotes *data);
@@ -118,4 +121,21 @@ char		*ft_remove(char *str);
 void		close_fd(t_list **tmp, t_data *data, int fd0);
 void		check_eo(t_list *head, t_data *data, int fd1, int fd0);
 void		wait_proccess(t_data *data, int proc);
+
+//
+
+t_list		*ft_create_var(char *command, char c);
+void		ft_print_list(t_list *head);
+void		ft_buffer_to_list(t_list **head, char **command);
+void		ft_if_exist_var(t_list *env, t_list *head);
+void		ft_link_node(t_list *head);
+void		ft_remove_if(t_list **head, char *target);
+t_list		*ft_fill_out(t_list **env_list, t_list *head);
+void		ft_echo(t_list *env, t_list *command);
+int			ft_strchr_edit(const char *s, int c);
+void		ft_cd(t_list *head, t_data *data);
+char		*ft_strdup_if(char *str, char c);
+char		*ft_remove(char *str);
+void		ft_buffer_to_list_v1(t_list **head, t_list *command);
+int			ft_builting(t_data *data, t_list *command);
 #endif

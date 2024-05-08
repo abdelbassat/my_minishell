@@ -6,11 +6,20 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/07 20:17:00 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 20:13:44 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
+
+void	ft_print_error(char *cmd, char *str)
+{
+	ft_putstr_fd("minishell : ", 2);
+	ft_putstr_fd(cmd, 2);
+	ft_putstr_fd(" :", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd("\n", 2);
+}
 
 char	*ft_new_strjoin(char *str, char c)
 {
@@ -72,7 +81,8 @@ char	*ft_return_variable(char *str, int *i)
 			flag = 1;
 		(*i)++;
 	}
-	
+	if (!var)
+		return (ft_new_strjoin(NULL, '$'));
 	var = getenv(var);
 	if (!var)
 		var = ft_new_strjoin(NULL, 0);
@@ -109,6 +119,7 @@ char	*ft_remove(char *str)
 			join = ft_new_strjoin(join, str[i]);
 		i++;
 	}
+	// exit(0);
 	return (join);
 }
 
@@ -130,21 +141,39 @@ t_list	*ft_handel_qutes(t_list *head)
 	return (command);
 }
 
+int	ft_lstsize_v1(t_list *head)
+{
+	int	i;
+
+	i = 0;
+	while (head)
+	{
+		if ((head->content)[0] || (!head->next && i == 0))
+			i++;
+		head = head->next;
+	}
+	return (i);
+}
 char	**last_command(t_list *head)
 {
 	int		i;
 	int		size;
 	char	**arr;
+	char	*cmd;
 
 	if (!head)
 		return (NULL);
 	i = 0;
-	size = ft_lstsize(head);
+	size = ft_lstsize_v1(head);
 	arr = malloc(sizeof(char *) * (size + 1));
 	while (head)
 	{
-		arr[i] = ft_strtrim(head->content , " ");
-		i++;
+		cmd = ft_strtrim(head->content, " ");
+		if (cmd[0] || (!head->next && i == 0))
+		{
+			arr[i] = cmd;
+			i++;
+		}
 		head = head->next;
 	}
 	arr[i] = NULL;
@@ -160,45 +189,58 @@ void	ft_handel_redic(t_list **redic, t_data *data, int flag)
 		data->out = data->outfile;
 }
 
-void	ft_exec_command(char *cmd, char **command, t_data *data, int cls)
+void	ft_exec_command(t_data *data, int cls, t_list *head)
 {
-	if (data->in != STDIN_FILENO)
-	{
-		dup2(data->in, STDIN_FILENO);
-		close(data->in);
-	}
-	if (data->out != STDOUT_FILENO)
-	{
-		dup2(data->out, STDOUT_FILENO);
-		close(cls);
-		close(data->out);
-	}
-	execve(cmd, command, data->env);
-	data->status = 127;
-	perror(ft_strjoin("minishell :", cmd));
-}
+	char	**command;
+	char	*cmd;
 
-int	ft_handel_satatus_code(int n)
-{
-	while (n > 255)
-		n -= 255;
-	return (n);
+	command = last_command(head);
+	cmd = ft_check_command(command[0]);
+	if (cmd[0])
+	{
+		if (ft_strrchr(cmd, '/') && opendir(cmd))
+		{
+			ft_print_error(cmd, "Is a directory");
+			data->status = 126;
+		}
+		else
+		{
+			data->pid = fork();
+			if (!data->pid)
+			{
+				if (data->in != STDIN_FILENO)
+				{
+					dup2(data->in, STDIN_FILENO);
+					close(data->in);
+				}
+				if (data->out != STDOUT_FILENO)
+				{
+					dup2(data->out, STDOUT_FILENO);
+					close(cls);
+					close(data->out);
+				}
+				if (ft_builting(data, head) == 1)
+					execve(cmd, command, data->env);
+				//  ft_print_error(cmd, strerror(errno));
+				exit(1);
+			}
+		}
+	}
 }
 
 void	ft_command(t_list *head, t_data *data, int cls)
 {
-	char	*cmd;
-	char	**command;
-
-	if (!strcmp(head->command->content, "echo") && head->command->next->content && !strcmp(head->command->next->content, "$?"))
+	if (!strcmp(head->command->content, "echo") && head->command->next
+		&& !strcmp(head->command->next->content, "$?"))
 	{
 		printf("%d\n", data->status);
+		data->status = 0;
 		return ;
 	}
 	head->command = ft_handel_qutes(head->command);
 	head->here_doc = ft_handel_qutes(head->here_doc);
 	head->redic = ft_handel_qutes(head->redic);
-	ft_handel_redic(&head->redic, data, 1);
+	ft_handel_redic(&(head->redic), data, 1);
 	if (head->int_file == 2)
 		data->in = head->in;
 	if (data->in == -1 || data->out == -1 || !head->command)
@@ -206,12 +248,5 @@ void	ft_command(t_list *head, t_data *data, int cls)
 		data->status = 1;
 		return ;
 	}
-	command = last_command(head->command);
-	cmd = ft_check_command(command[0], data);
-	
-	data->pid = fork();
-	if (data->pid == 0)
-		ft_exec_command(cmd, command, data, cls);
-	free(cmd);
-	ft_free(command);
+	ft_exec_command(data, cls, head->command);
 }

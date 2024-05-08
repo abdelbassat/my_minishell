@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:49:51 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/07 11:39:32 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 15:44:41 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,8 @@ int	ft_check_syntax(t_list *head, int flag)
 	{
 		if (head->x == 2)
 			save = 1;
-		if (head->x == flag && (!head->next || head->next->x == flag))
+		if ((head->x == flag && (!head->next || head->next->x == flag))
+			|| (head->x == 4 && i == 0))
 			value = 1;
 		if (save && ft_count_qutes(head->content, &qutes))
 			value = 1;

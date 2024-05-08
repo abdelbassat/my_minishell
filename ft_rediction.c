@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/07 09:34:49 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 16:18:35 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,10 @@ void	ft_exec_redic(t_list *head, t_data *data, int flag)
 	{
 		ft_exec_utils(head, data, flag);
 		if (data->intfile == -1 || data->outfile == -1)
+		{
+			data->status = 1;
 			break ;
+		}
 		head = head->next;
 		if (head)
 			head = head->next;

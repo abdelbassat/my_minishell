@@ -6,38 +6,38 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 01:37:39 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/07 14:01:45 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 17:53:52 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-char	*ft_check_command(char *command, t_data *data)
+char	*ft_check_command(char *command)
 {
-	char	*env_path;
 	char	*path;
+	t_list	*head;
 	char	*cmd;
-	char	**bins;
-	int		i;
+	t_list	*tmp;
 
-	data->check_Cmd = 0;
-	env_path = getenv("PATH");
-	if (env_path && command[0] != '.')
+	path = getenv("PATH");
+	if (path && !ft_strrchr(command, '/') && ft_strtrim(command, " ")[0]
+		&& !ft_strrchr(command, '.'))
 	{
-		bins = ft_split(env_path, ':');
-		i = 0;
-		while (bins[i])
+		head = split_end_or(path, ":", 0);
+		tmp = head;
+		cmd = ft_strjoin("/", command);
+		while (head)
 		{
-			path = ft_strjoin(bins[i], "/");
-			cmd = ft_strjoin(path, command);
-			data->check_Cmd = access(cmd, F_OK & X_OK);
-			if (data->check_Cmd == 0)
-				return (ft_free(bins), free(path), cmd);
-			free(path);
-			free(cmd);
-			i++;
+			if (head->x == 0)
+			{
+				path = ft_strjoin(head->content, cmd);
+				if (access(path, F_OK) == 0)
+					return (free(cmd), ft_lstclear(&tmp, free), path);
+			}
+			head = head->next;
 		}
-		ft_free(bins);
+		free(cmd);
+		ft_lstclear(&tmp, free);
 	}
 	return (ft_strdup(command));
 }

@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/07 18:08:08 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 19:34:19 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ int	main(int ac, char **av, char **env)
 	// printf("PID %d\n", getpid());
 	(signal(SIGTERM, SIG_IGN));
 	head = NULL;
-	data.env_list = NULL;
 	data.status = 0;
 	data.in = 0;
 	data.intfile = 0;
@@ -34,6 +33,7 @@ int	main(int ac, char **av, char **env)
 	data.red = 0;
 	data.check_Cmd = 0;
 	data.env = env;
+	data.env_list = NULL;
 	ft_buffer_to_list(&data.env_list, env);
 	(void)av;
 	if (ac != 1)
@@ -63,7 +63,6 @@ int	main(int ac, char **av, char **env)
 			data.in = 0;
 			data.out = 1;
 		}
-		// data.status = 0;
 	}
 	return (0);
 }
