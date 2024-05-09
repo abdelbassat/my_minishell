@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 20:10:07 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/09 11:42:27 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,10 +98,9 @@ void		ft_free_list_node(t_list **head);
 void		ft_free_trees(t_list **head);
 void		red(void);
 void		cyan(void);
-char		*ft_return_variable(char *str, int *i);
 void		yellow(void);
 void		reset(void);
-t_list		*ft_handel_qutes(t_list *head);
+t_list		*ft_handel_qutes(t_list *head, t_data *data);
 void		ft_Error(char *path);
 char		*ft_pwd(int flags);
 void		ft_check_quotes(char c, t_quotes *data);
@@ -112,18 +111,20 @@ void		ft_syntax(char *line, t_data *data);
 char		*join_command(t_list *head);
 int			ft_read_stdin(char *end);
 void		ft_free(char **str);
-char		*ft_check_command(char *command);
+char		*ft_check_command(t_data *data, char *command);
 char		**last_command(t_list *head);
 int			access_outfile_herdoc(char *path);
 void		initialize(t_quotes *data);
+char		*ft_return_variable(char *str, int *i, t_data *data);
 char		*ft_new_strjoin(char *str, char c);
-char		*ft_remove(char *str);
+char		*ft_remove(char *str, t_data *data);
+char		*ft_getenv(t_data *data, char *search);
 void		close_fd(t_list **tmp, t_data *data, int fd0);
 void		check_eo(t_list *head, t_data *data, int fd1, int fd0);
 void		wait_proccess(t_data *data, int proc);
 
-//
-
+char		*ft_search_if_key_exist_env_home(t_list **env, char *head,
+				t_data *data);
 t_list		*ft_create_var(char *command, char c);
 void		ft_print_list(t_list *head);
 void		ft_buffer_to_list(t_list **head, char **command);
@@ -135,7 +136,7 @@ void		ft_echo(t_list *env, t_list *command);
 int			ft_strchr_edit(const char *s, int c);
 void		ft_cd(t_list *head, t_data *data);
 char		*ft_strdup_if(char *str, char c);
-char		*ft_remove(char *str);
 void		ft_buffer_to_list_v1(t_list **head, t_list *command);
 int			ft_builting(t_data *data, t_list *command);
+void		ft_handle_signals(void);
 #endif

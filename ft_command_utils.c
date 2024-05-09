@@ -6,20 +6,20 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 01:37:39 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 17:53:52 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/09 10:12:35 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-char	*ft_check_command(char *command)
+char	*ft_check_command(t_data *data, char *command)
 {
 	char	*path;
 	t_list	*head;
 	char	*cmd;
 	t_list	*tmp;
 
-	path = getenv("PATH");
+	path = ft_getenv(data, "PATH");
 	if (path && !ft_strrchr(command, '/') && ft_strtrim(command, " ")[0]
 		&& !ft_strrchr(command, '.'))
 	{
@@ -47,7 +47,7 @@ void	ft_display(t_list *ptr)
 	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 	while (ptr)
 	{
-		printf("%s\n", (char *)ptr->content);
+		printf("--%s--\n", (char *)ptr->content);
 		ptr = ptr->next;
 	}
 	printf("++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");

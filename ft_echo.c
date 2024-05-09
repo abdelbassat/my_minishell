@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 03:16:22 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 19:43:32 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/09 10:16:45 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,38 +110,21 @@ void	ft_echo(t_list *env, t_list *command)
 {
 	t_list	*temp;
 	int		flag_op;
-	int		flag;
-	char	*var1;
-	char	*var2;
 
+	(void)env;
 	temp = NULL;
 	flag_op = 0;
-	flag = 0;
 	command = command->next;
 	while (command)
 	{
 		if (strcmp(command->content, "-n") == 0)
-		{
 			flag_op = 1;
-			command = command->next;
-		}
-		if (ft_strchr_edit(command->content, '$') == 1)
-		{
-			var1 = ft_substr(command->content, 0,
-					ft_found_dolar(command->content));
-			if (!ft_strtrim(var1, " "))
-				printf("%s ", var1);
-			else
-				printf("%s", var1);
-			var2 = ft_substr(command->content, ft_found_dolar(command->content),
-					ft_strlen(command->content));
-			temp = ft_create_var(var2, '$');
-			ft_if_exist_var_echo(env, temp);
-			flag = 1;
-		}
 		else
-			printf("%s ", command->content);
-		flag = 0;
+		{
+			ft_putstr_fd(command->content, 1);
+			if (command->next)
+				ft_putchar_fd(' ', 1);
+		}
 		command = command->next;
 	}
 	if (flag_op == 1)

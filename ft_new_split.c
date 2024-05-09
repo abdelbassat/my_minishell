@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:59:46 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/06 20:53:27 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/09 10:28:43 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,9 @@ void	ft_check_quotes(char c, t_quotes *data)
 		data->cp++;
 	else if (c == ')' && !data->cq && !data->cs)
 		data->cp--;
-	if (c == 34 && !data->cq)
+	if (c == 34 && !data->cq && !data->cs)
 		data->cq++;
-	else if (c == 34)
+	else if (c == 34 && !data->cs)
 		data->cq--;
 	if (c == 39 && !data->cq && !data->cs)
 		data->cs++;

@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 20:13:44 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/09 11:20:21 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,9 @@ void	ft_print_error(char *cmd, char *str)
 {
 	ft_putstr_fd("minishell : ", 2);
 	ft_putstr_fd(cmd, 2);
-	ft_putstr_fd(" :", 2);
+	ft_putstr_fd(" : ", 2);
+	if (!ft_strrchr(cmd, '/'))
+		str = "command not found";
 	ft_putstr_fd(str, 2);
 	ft_putstr_fd("\n", 2);
 }
@@ -48,7 +50,7 @@ char	*ft_new_strjoin(char *str, char c)
 	return (join);
 }
 
-char	*ft_qutes(char *str, int *i, char c)
+char	*ft_qutes(char *str, int *i, char c, t_data *data)
 {
 	char	*var;
 
@@ -56,7 +58,10 @@ char	*ft_qutes(char *str, int *i, char c)
 	var = NULL;
 	while (str[*i] && str[*i] != c)
 	{
-		var = ft_new_strjoin(var, str[*i]);
+		if (str[*i] == '$' && c == 34)
+			var = ft_return_variable(str, i, data);
+		else
+			var = ft_new_strjoin(var, str[*i]);
 		(*i)++;
 	}
 	if (!var)
@@ -64,34 +69,26 @@ char	*ft_qutes(char *str, int *i, char c)
 	return (var);
 }
 
-char	*ft_return_variable(char *str, int *i)
+char	*ft_return_variable(char *str, int *i, t_data *data)
 {
 	char	*var;
-	char	*join;
 	int		flag;
 
 	var = NULL;
-	join = NULL;
 	flag = 0;
 	while (str[*i] && str[*i] != ' ' && str[*i] != 34 && str[*i] != 39)
 	{
-		if (flag == 1)
-			var = ft_new_strjoin(var, str[*i]);
-		else if (str[*i] == '$')
-			flag = 1;
+		var = ft_new_strjoin(var, str[*i]);
 		(*i)++;
 	}
-	if (!var)
-		return (ft_new_strjoin(NULL, '$'));
-	var = getenv(var);
+	var = ft_getenv(data, &var[1]);
 	if (!var)
 		var = ft_new_strjoin(NULL, 0);
-	join = ft_strjoin(join, var);
 	(*i)--;
-	return (join);
+	return (var);
 }
 
-char	*ft_remove(char *str)
+char	*ft_remove(char *str, t_data *data)
 {
 	int		i;
 	char	*join;
@@ -112,18 +109,25 @@ char	*ft_remove(char *str)
 				flag = 0;
 		}
 		if (str[i] == '$' && flag)
-			join = ft_strjoin(join, ft_return_variable(str, &i));
+		{
+			if (str[i + 1] == '?')
+			{
+				join = ft_strjoin(join, ft_itoa(data->status));
+				i++;
+			}
+			else
+				join = ft_strjoin(join, ft_return_variable(str, &i, data));
+		}
 		else if (str[i] == c)
-			join = ft_strjoin(join, ft_qutes(str, &i, c));
+			join = ft_strjoin(join, ft_qutes(str, &i, c, data));
 		else
 			join = ft_new_strjoin(join, str[i]);
 		i++;
 	}
-	// exit(0);
 	return (join);
 }
 
-t_list	*ft_handel_qutes(t_list *head)
+t_list	*ft_handel_qutes(t_list *head, t_data *data)
 {
 	t_list	*command;
 	char	*cmd;
@@ -133,7 +137,7 @@ t_list	*ft_handel_qutes(t_list *head)
 	command = NULL;
 	while (head)
 	{
-		cmd = ft_remove(head->content);
+		cmd = ft_remove(head->content, data);
 		ft_lstadd_back(&command, ft_lstnew(cmd));
 		head = head->next;
 	}
@@ -193,9 +197,11 @@ void	ft_exec_command(t_data *data, int cls, t_list *head)
 {
 	char	**command;
 	char	*cmd;
+	int		flag;
 
+	flag = 0;
 	command = last_command(head);
-	cmd = ft_check_command(command[0]);
+	cmd = ft_check_command(data, command[0]);
 	if (cmd[0])
 	{
 		if (ft_strrchr(cmd, '/') && opendir(cmd))
@@ -205,6 +211,9 @@ void	ft_exec_command(t_data *data, int cls, t_list *head)
 		}
 		else
 		{
+			if (data->check_Cmd == 1)
+				if (!ft_builting(data, head))
+					return ;
 			data->pid = fork();
 			if (!data->pid)
 			{
@@ -219,10 +228,14 @@ void	ft_exec_command(t_data *data, int cls, t_list *head)
 					close(cls);
 					close(data->out);
 				}
-				if (ft_builting(data, head) == 1)
+				if ((flag = ft_builting(data, head) == 1))
 					execve(cmd, command, data->env);
-				//  ft_print_error(cmd, strerror(errno));
-				exit(1);
+				if (flag == 1)
+				{
+					ft_print_error(cmd, strerror(errno));
+					exit(127);
+				}
+				exit(0);
 			}
 		}
 	}
@@ -230,16 +243,9 @@ void	ft_exec_command(t_data *data, int cls, t_list *head)
 
 void	ft_command(t_list *head, t_data *data, int cls)
 {
-	if (!strcmp(head->command->content, "echo") && head->command->next
-		&& !strcmp(head->command->next->content, "$?"))
-	{
-		printf("%d\n", data->status);
-		data->status = 0;
-		return ;
-	}
-	head->command = ft_handel_qutes(head->command);
-	head->here_doc = ft_handel_qutes(head->here_doc);
-	head->redic = ft_handel_qutes(head->redic);
+	head->command = ft_handel_qutes(head->command, data);
+	head->here_doc = ft_handel_qutes(head->here_doc, data);
+	head->redic = ft_handel_qutes(head->redic, data);
 	ft_handel_redic(&(head->redic), data, 1);
 	if (head->int_file == 2)
 		data->in = head->in;

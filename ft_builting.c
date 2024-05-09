@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 19:25:03 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 20:12:09 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/09 10:17:47 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,6 @@ void	ft_unset(t_list *command_list, t_data *data)
 }
 
 void	ft_ECHO(t_list *command, t_data *data)
-// problem change char ** to t_list
 {
 	ft_link_node(data->env_list);
 	ft_echo(data->env_list, command);
@@ -121,6 +120,7 @@ void	ft_pwd_m(void)
 int	ft_builting(t_data *data, t_list *command)
 {
 	char *str = ft_strtrim(command->content, " ");
+
 	if (!strcmp(str, "env"))
 		ft_print_list(data->env_list);
 	else if (!strcmp(str, "export"))

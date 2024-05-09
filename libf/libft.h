@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 11:38:49 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/04 22:04:51 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 19:28:56 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,14 @@ typedef struct s_list
 	int				in;
 	int				out;
 	char			*content;
+	char *key;
+	char *value;
 
 	struct s_list	*command;
-	struct s_list	*next;
 	struct s_list	*redic;
 	struct s_list	*here_doc;
 	struct s_list	*new_list;
+	struct s_list	*next;
 }					t_list;
 
 int					ft_atoi(const char *theString);

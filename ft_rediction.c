@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 16:18:35 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/09 14:40:16 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ void	ft_exec_redic(t_list *head, t_data *data, int flag)
 	}
 }
 
+
+
 int	ft_read_stdin(char *end)
 {
 	char	*buff;
@@ -62,6 +64,7 @@ int	ft_read_stdin(char *end)
 	while (1)
 	{
 		buff = readline("> ");
+		// signal(SIGINT, ft_test);
 		if (!buff || !strcmp(buff, end))
 			break ;
 		write(fd, buff, ft_strlen(buff));

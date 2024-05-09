@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:58:14 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/06 16:09:34 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 23:25:13 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ void	ft_nested_pip_ex(t_list *head, t_data *data, int fd1, int fd0)
 		if (data->exec == 0)
 		{
 			tmp = head->new_list;
+			data->check_Cmd = ft_lstsize(tmp);
 			while (head->new_list)
 			{
 				exec_utils(head, data, fd1, fd0);

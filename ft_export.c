@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:56:16 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 19:40:15 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/08 23:00:11 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,19 +71,16 @@ void	ft_if_exist_var(t_list *env, t_list *head) // hena can not cause leaks
 		{
 			while (temp_node)
 			{
-				if (strcmp((char *)temp_env->key, (char *)temp_node->key) == 0
-					&& strcmp((char *)temp_env->value,
-						(char *)temp_node->value) != 0
-					&& ft_if_plus_eql((char *)temp_node->content) == 0)
+				if (strcmp(temp_env->key, temp_node->key) == 0
+					&& strcmp(temp_env->value, temp_node->value) != 0
+					&& ft_if_plus_eql(temp_node->content) == 0)
 				{
-					temp_env->content = ft_strdup((char *)ft_remove((char *)temp_node->content));
-					temp_env->value = ft_strdup((char *)ft_remove((char *)temp_node->value));
+					temp_env->content = ft_strdup(temp_node->content);
+					temp_env->value = ft_strdup(temp_node->value);
 				}
-				else if (ft_if_plus_eql((char *)temp_node->content) == 1
-					&& strcmp((char *)temp_env->key,
-						(char *)temp_node->key) == 0)
-					temp_env->value = strcat((char *)temp_env->value,
-							(char *)ft_remove((char *)temp_node->value));
+				else if (ft_if_plus_eql(temp_node->content) == 1
+					&& strcmp(temp_env->key, temp_node->key) == 0)
+					temp_env->value = strcat(temp_env->value, temp_node->value);
 				temp_node = temp_node->next;
 			}
 			temp_node = head;
@@ -257,8 +254,7 @@ t_list	*ft_fill_out(t_list **env_list, t_list *head)
 		{
 			result = temp;
 			result = ft_create_var((char *)temp->content, '+');
-			ft_lstadd_back(env_list,
-				ft_lstnew((char *)ft_remove((char *)result->content)));
+			ft_lstadd_back(env_list, ft_lstnew(result->content));
 			ft_link_node(*env_list);
 			ft_lstclear(&result, free);
 		}

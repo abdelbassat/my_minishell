@@ -3,21 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmad <mmad@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 12:20:44 by mmad              #+#    #+#             */
-/*   Updated: 2024/05/08 18:49:45 by mmad             ###   ########.fr       */
+/*   Updated: 2024/05/09 11:20:36 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-char	*ft_search_if_key_exist_env_home(t_list **env, char *head)
+char	*ft_search_if_key_exist_env_home(t_list **env, char *head, t_data *data)
 {
 	t_list	*temp_env;
 
 	if (!head || !env || !(*env))
 		return (NULL);
+	else if (!strcmp(head, "?"))
+		return (ft_itoa(data->status));
 	temp_env = *env;
 	if (temp_env->key && temp_env->value)
 	{
@@ -35,10 +37,12 @@ char	*ft_search_if_key_exist_env_home(t_list **env, char *head)
 	return (NULL);
 }
 
-char	*ft_getenv(t_data *data)
+char	*ft_getenv(t_data *data, char *search)
 {
+	if (search[0] == 0)
+		return (ft_strdup("$"));
 	ft_link_node(data->env_list);
-	return (ft_search_if_key_exist_env_home(&data->env_list, "HOME"));
+	return (ft_search_if_key_exist_env_home(&data->env_list, search, data));
 }
 
 void	ft_cd(t_list *head, t_data *data)
@@ -69,6 +73,7 @@ void	ft_cd(t_list *head, t_data *data)
 	else if (ft_lstsize(temp) > 2)
 		printf("minishell: cd: too many arguments\n");
 	else
-		chdir(ft_getenv(data));
+		chdir(ft_getenv(data, "HOME"));
+	// error
 	free(path);
 }
