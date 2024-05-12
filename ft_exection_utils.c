@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 01:35:45 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 14:13:42 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/11 10:42:21 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,24 +38,25 @@ void	check_eo(t_list *head, t_data *data, int fd1, int fd0)
 	}
 }
 
+unsigned char	ft_test(unsigned char nn)
+{
+	return (nn);
+}
+
 void	wait_proccess(t_data *data, int proc)
 {
 	int	status;
 	int	tmp;
 
+	tmp = 0;
 	while (1)
 	{
 		status = wait(&tmp);
 		if (status == proc)
-		{
-			if (data->status != 127)
-				data->status = tmp;
-		}
-		else if (status == -1)
+			data->status = tmp;
+		if (status == -1)
 			break ;
 	}
-	while (data->status > 255)
-		data->status -= 255;
 }
 
 void	close_fd(t_list **tmp, t_data *data, int fd0)

@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 14:40:16 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/11 12:21:16 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	ft_exec_utils(t_list *head, t_data *data, int flag)
 			data->outfile = access_outfile((char *)head->next->content);
 		else if (strcmp(red, "<") == 0)
 			data->intfile = access_intfile((char *)head->next->content);
-		if (data->intfile == -1)
+		if (data->intfile == -1 || data->outfile == -1)
 			return ;
 	}
 	else
@@ -52,29 +52,34 @@ void	ft_exec_redic(t_list *head, t_data *data, int flag)
 			head = head->next;
 	}
 }
-
-
-
+void	ft_handle_red(int i)
+{
+	(void)i;
+	printf("\n");
+	close(0);
+}
 int	ft_read_stdin(char *end)
 {
 	char	*buff;
 	int		fd;
+	int		input;
 
-	fd = open("a", O_CREAT | O_RDWR, 0644);
+	fd = open("a", O_CREAT | O_RDWR, 0600);
+	input = dup(0);
+	signal(SIGINT, ft_handle_red);
 	while (1)
 	{
 		buff = readline("> ");
-		// signal(SIGINT, ft_test);
 		if (!buff || !strcmp(buff, end))
 			break ;
 		write(fd, buff, ft_strlen(buff));
 		write(fd, "\n", 1);
 	}
-	if (!buff)
-		printf("minishell: warning: here-document at line 1 delimited by end-of-file (wanted `%s')\n",
-			end);
+	dup2(input, 0);
+	close(input);
+	signal(SIGINT, handle_signal);
 	close(fd);
-	fd = open("a", O_CREAT | O_RDWR, 0644);
+	fd = open("a", O_CREAT | O_RDWR, 0400);
 	return (fd);
 }
 

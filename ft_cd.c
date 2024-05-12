@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 12:20:44 by mmad              #+#    #+#             */
-/*   Updated: 2024/05/09 11:20:36 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/11 12:04:49 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ char	*ft_search_if_key_exist_env_home(t_list **env, char *head, t_data *data)
 
 char	*ft_getenv(t_data *data, char *search)
 {
-	if (search[0] == 0)
+	if (!search)
 		return (ft_strdup("$"));
 	ft_link_node(data->env_list);
 	return (ft_search_if_key_exist_env_home(&data->env_list, search, data));
@@ -54,24 +54,19 @@ void	ft_cd(t_list *head, t_data *data)
 	path = getcwd(path, 1024);
 	if (ft_lstsize(temp) == 2)
 	{
-		char *new_dir = ft_strdup((char *)temp->next->content);
-		if (strcmp((char *)temp->next->content, "..") != 0
-			&& chdir(new_dir) != 0)
+		char *new_dir = ft_strdup(temp->next->content);
+		if (chdir(new_dir))
 		{
+			data->status = 1;
 			perror(ft_strjoin("minishell: cd: ", (char *)temp->next->content));
-			return ;
-		}
-		if (strcmp((char *)temp->next->content, "..") == 0)
-		{
-			path = getcwd(path, 1024);
-			chdir("..");
-			path = getcwd(path, 1024);
-			chdir(path);
 		}
 		free(new_dir);
 	}
 	else if (ft_lstsize(temp) > 2)
+	{
 		printf("minishell: cd: too many arguments\n");
+		data->status = 1;
+	}
 	else
 		chdir(ft_getenv(data, "HOME"));
 	// error

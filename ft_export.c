@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 13:56:16 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/08 23:00:11 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/10 20:09:37 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,11 +161,8 @@ void	ft_link_node(t_list *head) // hena can not cause leaks
 			temp->key = ft_substr((char *)temp->content, 0,
 					ft_found_equal((char *)temp->content));
 			if (ft_strchr_edit((char *)temp->key, '+') == 1)
-			{
 				printf("bash: export: `%s': not a valid identifier\n",
 					(char *)temp->content);
-				exit(1);
-			}
 			temp->value = ft_strchr_i((char *)temp->content);
 		}
 		else

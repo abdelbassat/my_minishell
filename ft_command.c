@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 11:20:21 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 14:27:26 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,84 +50,136 @@ char	*ft_new_strjoin(char *str, char c)
 	return (join);
 }
 
-char	*ft_qutes(char *str, int *i, char c, t_data *data)
+char	*ft_qutes(char *str, char *value, int *i, char c, t_data *data,
+		int flag, t_list **head)
 {
 	char	*var;
+	char	*join;
 
 	(*i)++;
 	var = NULL;
+	join = NULL;
 	while (str[*i] && str[*i] != c)
 	{
-		if (str[*i] == '$' && c == 34)
+		if (str[*i] == '$' && c == 34 && !flag)
+		{
 			var = ft_return_variable(str, i, data);
+			if (!join)
+				join = ft_strdup("");
+			join = ft_strjoin(value, join);
+			var = ft_handel_expend(head, var, join);
+			join = NULL;
+			join = ft_strjoin(join, var);
+		}
 		else
-			var = ft_new_strjoin(var, str[*i]);
-		(*i)++;
+		{
+			join = ft_new_strjoin(join, str[*i]);
+			(*i)++;
+		}
 	}
-	if (!var)
-		var = ft_strdup("");
-	return (var);
+	if (!join)
+		join = ft_strdup("");
+	(*i)++;
+	return (join);
 }
 
 char	*ft_return_variable(char *str, int *i, t_data *data)
 {
 	char	*var;
-	int		flag;
 
 	var = NULL;
-	flag = 0;
-	while (str[*i] && str[*i] != ' ' && str[*i] != 34 && str[*i] != 39)
+	(*i)++;
+	if (str[*i] == '?')
+	{
+		var = ft_getenv(data, "?");
+		(*i)++;
+		return (var);
+	}
+	while (str[*i] && ft_isalnum(str[*i]))
 	{
 		var = ft_new_strjoin(var, str[*i]);
 		(*i)++;
 	}
-	var = ft_getenv(data, &var[1]);
+	var = ft_getenv(data, var);
 	if (!var)
-		var = ft_new_strjoin(NULL, 0);
-	(*i)--;
+		var = ft_strdup("");
 	return (var);
 }
 
-char	*ft_remove(char *str, t_data *data)
+char	*ft_handel_expend(t_list **head, char *var, char *join)
+{
+	t_list	*expend;
+	char	*value;
+	t_list	*node;
+
+	expend = NULL;
+	value = ft_strdup("");
+	if (var[0])
+	{
+		expend = split_end_or(var, " ", 0);
+		expend->content = ft_strjoin(join, expend->content);
+		while (expend->next)
+		{
+			node = ft_wild_card(expend->content);
+			ft_lstadd_back(head, node);
+			expend = expend->next;
+		}
+		value = ft_strdup(expend->content);
+	}
+	return (value);
+}
+
+char	*ft_remove(char *str, t_data *data, int flag, t_list **head)
 {
 	int		i;
 	char	*join;
 	char	c;
 	char	*var;
-	int		flag;
+	int		ff;
 
-	flag = 1;
+	ff = 0;
 	var = NULL;
 	i = 0;
 	join = NULL;
 	while (str[i])
 	{
 		if (str[i] == 34 || str[i] == 39)
-		{
 			c = str[i];
-			if (c == 39)
-				flag = 0;
-		}
-		if (str[i] == '$' && flag)
+		if (str[i] == '$' && !flag)
 		{
-			if (str[i + 1] == '?')
-			{
-				join = ft_strjoin(join, ft_itoa(data->status));
-				i++;
-			}
-			else
-				join = ft_strjoin(join, ft_return_variable(str, &i, data));
+			ff = 1;
+			var = ft_return_variable(str, &i, data);
+			// printf("--%s--\n", var);
+			// // res = ft_wild_card(var);
+			// // while (res)
+			// // {
+			// // 	var = ft_strjoin(var, res->content);
+			// 	var = ft_strjoin(var, " ");
+			// 	res = res->next;
+			// }
+			var = ft_handel_expend(head, var, join);
+			join = NULL;
+			join = ft_strjoin(join, var);
 		}
 		else if (str[i] == c)
-			join = ft_strjoin(join, ft_qutes(str, &i, c, data));
+			join = ft_strjoin(join, ft_qutes(str, join, &i, c, data, flag,
+						head));
 		else
+		{
 			join = ft_new_strjoin(join, str[i]);
-		i++;
+			i++;
+		}
+	}
+	if (ff == 1)
+	{
+		var = ft_handel_expend(head, join, join);
+		join = NULL;
+		join = ft_strjoin(join, var);
 	}
 	return (join);
 }
 
-t_list	*ft_handel_qutes(t_list *head, t_data *data)
+t_list	*ft_handel_qutes(t_list *head, t_data *data, int flag)
 {
 	t_list	*command;
 	char	*cmd;
@@ -137,8 +189,9 @@ t_list	*ft_handel_qutes(t_list *head, t_data *data)
 	command = NULL;
 	while (head)
 	{
-		cmd = ft_remove(head->content, data);
-		ft_lstadd_back(&command, ft_lstnew(cmd));
+		cmd = ft_remove(head->content, data, flag, &command);
+		if (cmd)
+			ft_lstadd_back(&command, ft_lstnew(cmd));
 		head = head->next;
 	}
 	ft_lstclear(&tmp, free);
@@ -148,37 +201,49 @@ t_list	*ft_handel_qutes(t_list *head, t_data *data)
 int	ft_lstsize_v1(t_list *head)
 {
 	int	i;
+	int	flag;
 
 	i = 0;
+	flag = 0;
 	while (head)
 	{
-		if ((head->content)[0] || (!head->next && i == 0))
+		if ((head->content)[0] || flag == 1)
+		{
 			i++;
+			flag = 1;
+		}
 		head = head->next;
 	}
+	if (i == 0)
+		i++;
 	return (i);
 }
+
 char	**last_command(t_list *head)
 {
 	int		i;
 	int		size;
 	char	**arr;
-	char	*cmd;
+	int		flag;
 
-	if (!head)
-		return (NULL);
 	i = 0;
+	flag = 0;
 	size = ft_lstsize_v1(head);
 	arr = malloc(sizeof(char *) * (size + 1));
 	while (head)
 	{
-		cmd = ft_strtrim(head->content, " ");
-		if (cmd[0] || (!head->next && i == 0))
+		if ((head->content)[0] || flag == 1)
 		{
-			arr[i] = cmd;
+			arr[i] = ft_strdup(head->content);
+			flag = 1;
 			i++;
 		}
 		head = head->next;
+	}
+	if (i == 0)
+	{
+		arr[i] = ft_strdup("");
+		i++;
 	}
 	arr[i] = NULL;
 	return (arr);
@@ -243,13 +308,11 @@ void	ft_exec_command(t_data *data, int cls, t_list *head)
 
 void	ft_command(t_list *head, t_data *data, int cls)
 {
-	head->command = ft_handel_qutes(head->command, data);
-	head->here_doc = ft_handel_qutes(head->here_doc, data);
-	head->redic = ft_handel_qutes(head->redic, data);
 	ft_handel_redic(&(head->redic), data, 1);
+	// head->command = ft_join(head->command);
 	if (head->int_file == 2)
 		data->in = head->in;
-	if (data->in == -1 || data->out == -1 || !head->command)
+	if (data->intfile == -1 || data->outfile == -1 || !head->command)
 	{
 		data->status = 1;
 		return ;

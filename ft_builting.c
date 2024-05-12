@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/08 19:25:03 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 10:17:47 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/10 11:12:36 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,10 @@ int	ft_builting(t_data *data, t_list *command)
 		ft_cd(command, data);
 	else if (!strcmp(str, "pwd"))
 		ft_pwd_m();
+	else if (!strcmp(str, "exit"))
+		ft_exit(command, data);
 	else
 		return (1);
+	data->status = 0;
 	return (0);
 }

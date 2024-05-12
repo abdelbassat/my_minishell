@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 11:50:55 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/11 10:44:39 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,15 @@ void	handle_signal(int sig)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
+	}
+}
+void	handle_signal_cat(int sig)
+{
+	if (sig == SIGINT)
+	{
+		printf("\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
 	}
 }
 void	ft_handle_signals(void)
@@ -52,6 +61,7 @@ int	main(int ac, char **av, char **env)
 	data.check_Cmd = 0;
 	data.env = env;
 	data.env_list = NULL;
+	// printf("%d" ,SIZE_T_MAX);
 	ft_buffer_to_list(&data.env_list, env);
 	(void)av;
 	if (ac != 1)

@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 03:16:22 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 10:16:45 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 13:12:27 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,9 @@ int	ft_found_dolar(char *str)
 
 void	ft_echo(t_list *env, t_list *command)
 {
-	t_list	*temp;
-	int		flag_op;
+	int	flag_op;
 
 	(void)env;
-	temp = NULL;
 	flag_op = 0;
 	command = command->next;
 	while (command)

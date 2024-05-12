@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:49:51 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 10:29:13 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 13:40:35 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,4 +131,21 @@ void	ft_check_string(char *line, t_data *data)
 	}
 	if (qutes.cp || qutes.cq || qutes.cs || (qutes.en % 2) || (qutes.bk % 2))
 		data->red = 1;
+}
+
+int	ft_check_wildcard(char *line)
+{
+	int			i;
+	t_quotes	qutes;
+
+	i = 0;
+	initialize(&qutes);
+	while (line[i])
+	{
+		ft_check_quotes(line[i], &qutes);
+		i++;
+	}
+	if (qutes.cq || qutes.cs)
+		return (1);
+	return (0);
 }

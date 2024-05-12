@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 11:42:27 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 13:41:15 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ void		red(void);
 void		cyan(void);
 void		yellow(void);
 void		reset(void);
-t_list		*ft_handel_qutes(t_list *head, t_data *data);
+t_list		*ft_handel_qutes(t_list *head, t_data *data, int flag);
 void		ft_Error(char *path);
 char		*ft_pwd(int flags);
 void		ft_check_quotes(char c, t_quotes *data);
@@ -114,15 +114,18 @@ void		ft_free(char **str);
 char		*ft_check_command(t_data *data, char *command);
 char		**last_command(t_list *head);
 int			access_outfile_herdoc(char *path);
+int			ft_wild_card_string_matching(char *s, char *p);
+t_list		*ft_wild_card(char *p);
+int			ft_check_wildcard(char *line);
+t_list		*ft_join(t_list *head);
 void		initialize(t_quotes *data);
 char		*ft_return_variable(char *str, int *i, t_data *data);
 char		*ft_new_strjoin(char *str, char c);
-char		*ft_remove(char *str, t_data *data);
 char		*ft_getenv(t_data *data, char *search);
 void		close_fd(t_list **tmp, t_data *data, int fd0);
 void		check_eo(t_list *head, t_data *data, int fd1, int fd0);
 void		wait_proccess(t_data *data, int proc);
-
+char		*ft_handel_expend(t_list **head, char *var, char *join);
 char		*ft_search_if_key_exist_env_home(t_list **env, char *head,
 				t_data *data);
 t_list		*ft_create_var(char *command, char c);
@@ -139,4 +142,8 @@ char		*ft_strdup_if(char *str, char c);
 void		ft_buffer_to_list_v1(t_list **head, t_list *command);
 int			ft_builting(t_data *data, t_list *command);
 void		ft_handle_signals(void);
+void		ft_exit(t_list *head, t_data *data);
+void		handle_signal(int sig);
+void		handle_signal_cat(int sig);
+char		*ft_remove(char *str, t_data *data, int flag, t_list **head);
 #endif
