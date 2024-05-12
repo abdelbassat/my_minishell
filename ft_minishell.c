@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:33:37 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/11 10:44:39 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 16:41:06 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ int	main(int ac, char **av, char **env)
 	data.check_Cmd = 0;
 	data.env = env;
 	data.env_list = NULL;
-	// printf("%d" ,SIZE_T_MAX);
 	ft_buffer_to_list(&data.env_list, env);
 	(void)av;
 	if (ac != 1)

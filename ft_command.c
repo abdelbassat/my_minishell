@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 14:27:26 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 20:42:17 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,14 +50,12 @@ char	*ft_new_strjoin(char *str, char c)
 	return (join);
 }
 
-char	*ft_qutes(char *str, char *value, int *i, char c, t_data *data,
-		int flag, t_list **head)
+char	*ft_qutes(char *str, int *i, char c, t_data *data, int flag)
 {
 	char	*var;
 	char	*join;
 
 	(*i)++;
-	var = NULL;
 	join = NULL;
 	while (str[*i] && str[*i] != c)
 	{
@@ -66,10 +64,8 @@ char	*ft_qutes(char *str, char *value, int *i, char c, t_data *data,
 			var = ft_return_variable(str, i, data);
 			if (!join)
 				join = ft_strdup("");
-			join = ft_strjoin(value, join);
-			var = ft_handel_expend(head, var, join);
-			join = NULL;
 			join = ft_strjoin(join, var);
+			free(var);
 		}
 		else
 		{
@@ -136,9 +132,9 @@ char	*ft_remove(char *str, t_data *data, int flag, t_list **head)
 	char	c;
 	char	*var;
 	int		ff;
+	char	*res;
 
 	ff = 0;
-	var = NULL;
 	i = 0;
 	join = NULL;
 	while (str[i])
@@ -149,21 +145,17 @@ char	*ft_remove(char *str, t_data *data, int flag, t_list **head)
 		{
 			ff = 1;
 			var = ft_return_variable(str, &i, data);
-			// printf("--%s--\n", var);
-			// // res = ft_wild_card(var);
-			// // while (res)
-			// // {
-			// // 	var = ft_strjoin(var, res->content);
-			// 	var = ft_strjoin(var, " ");
-			// 	res = res->next;
-			// }
 			var = ft_handel_expend(head, var, join);
 			join = NULL;
 			join = ft_strjoin(join, var);
+			free(var);
 		}
 		else if (str[i] == c)
-			join = ft_strjoin(join, ft_qutes(str, join, &i, c, data, flag,
-						head));
+		{
+			res = ft_qutes(str, &i, c, data, flag);
+			join = ft_strjoin(join, res);
+			free(res);
+		}
 		else
 		{
 			join = ft_new_strjoin(join, str[i]);
@@ -172,7 +164,8 @@ char	*ft_remove(char *str, t_data *data, int flag, t_list **head)
 	}
 	if (ff == 1)
 	{
-		var = ft_handel_expend(head, join, join);
+		var = ft_strdup("");
+		var = ft_handel_expend(head, join, var);
 		join = NULL;
 		join = ft_strjoin(join, var);
 	}
@@ -309,7 +302,6 @@ void	ft_exec_command(t_data *data, int cls, t_list *head)
 void	ft_command(t_list *head, t_data *data, int cls)
 {
 	ft_handel_redic(&(head->redic), data, 1);
-	// head->command = ft_join(head->command);
 	if (head->int_file == 2)
 		data->in = head->in;
 	if (data->intfile == -1 || data->outfile == -1 || !head->command)

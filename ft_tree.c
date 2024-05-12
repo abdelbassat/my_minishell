@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:27:06 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 13:41:18 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 16:34:40 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,20 +25,21 @@ int	ft_math(int i)
 	return (number);
 }
 
-char	ft_reverse(char *str)
+int	ft_reverse(char *str)
 {
 	int	number;
 	int	i;
 
+	str = &str[7];
 	number = 0;
 	i = 0;
 	while (str[i])
 	{
 		if (str[i] == '1')
-			number += ft_math(i);
+			number += ft_math(7 - i);
 		i++;
 	}
-	return (number + 65);
+	return (number);
 }
 
 char	*ft_revers_to_base64(char *str)
@@ -50,8 +51,8 @@ char	*ft_revers_to_base64(char *str)
 	i = 0;
 	while (str[i])
 	{
-		join = ft_new_strjoin(join, ft_reverse(ft_substr(str, i, 6)));
-		i += 6;
+		join = ft_new_strjoin(join, ft_reverse(ft_substr(str, i, 8)));
+		i += 8;
 	}
 	return (join);
 }
@@ -167,6 +168,8 @@ void	ft_nested(t_list *head, t_data *data)
 	}
 	free(cmd);
 	head->command = ft_join(head->command);
+	head->redic = ft_join(head->redic);
+	head->here_doc = ft_join(head->here_doc);
 	list->command = ft_handel_qutes(list->command, data, 0);
 	list->redic = ft_handel_qutes(list->redic, data, 0);
 	list->here_doc = ft_handel_qutes(list->here_doc, data, 1);

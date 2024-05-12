@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 01:35:45 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/11 10:42:21 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 16:45:35 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ void	wait_proccess(t_data *data, int proc)
 		if (status == -1)
 			break ;
 	}
+	if (data->status >= 256)
+		data->status = ft_reverse(ft_convert(data->status));
 }
 
 void	close_fd(t_list **tmp, t_data *data, int fd0)

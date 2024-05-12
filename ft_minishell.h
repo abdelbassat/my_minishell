@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 13:41:15 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 18:42:36 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ typedef struct freee
 
 typedef struct Data
 {
+	char	*save;
 	int		check_Cmd;
 	int		intfile;
 	int		outfile;
@@ -76,7 +77,7 @@ typedef struct STR
 
 void		ft_buffer_to_list(t_list **head, char **command);
 char		*ft_revers_to_base64(char *str);
-char		ft_reverse(char *str);
+int			ft_reverse(char *str);
 char		*ft_base64(char *str);
 char		*ft_convert(int c);
 void		free_list(t_free *head, int flag);
@@ -95,6 +96,7 @@ void		ft_display(t_list *ptr);
 int			access_intfile(char *path);
 int			access_outfile(char *path);
 void		ft_free_list_node(t_list **head);
+char		*ft_qutes(char *str, int *i, char c, t_data *data, int flag);
 void		ft_free_trees(t_list **head);
 void		red(void);
 void		cyan(void);
@@ -109,7 +111,7 @@ void		ft_split_rediction(char *line, t_list **new);
 void		ft_free_tree(t_list *head);
 void		ft_syntax(char *line, t_data *data);
 char		*join_command(t_list *head);
-int			ft_read_stdin(char *end);
+int			ft_read_stdin(char *end, t_data *data);
 void		ft_free(char **str);
 char		*ft_check_command(t_data *data, char *command);
 char		**last_command(t_list *head);

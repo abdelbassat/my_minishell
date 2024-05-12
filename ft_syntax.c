@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:49:51 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 13:40:35 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/12 18:37:44 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ int	ft_check_syntax(t_list *head, int flag)
 	while (tmp && value == 1)
 	{
 		if (!strcmp(tmp->content, "<<") && tmp->next && flag == 2 && j < i)
-			ft_read_stdin(tmp->next->content);
+			ft_read_stdin(tmp->next->content, NULL);
 		j++;
 		tmp = tmp->next;
 	}
