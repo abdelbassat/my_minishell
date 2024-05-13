@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 16:27:06 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 16:34:40 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 12:35:57 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,9 +167,6 @@ void	ft_nested(t_list *head, t_data *data)
 		}
 	}
 	free(cmd);
-	head->command = ft_join(head->command);
-	head->redic = ft_join(head->redic);
-	head->here_doc = ft_join(head->here_doc);
 	list->command = ft_handel_qutes(list->command, data, 0);
 	list->redic = ft_handel_qutes(list->redic, data, 0);
 	list->here_doc = ft_handel_qutes(list->here_doc, data, 1);

@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 01:35:45 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 16:45:35 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 12:33:43 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,9 @@ void	wait_proccess(t_data *data, int proc)
 
 void	close_fd(t_list **tmp, t_data *data, int fd0)
 {
-	t_list *head = *tmp;
+	t_list	*head;
+
+	head = *tmp;
 	if (head->new_list->next != NULL)
 	{
 		close(data->fd[1]);

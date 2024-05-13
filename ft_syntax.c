@@ -6,18 +6,11 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:49:51 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 18:37:44 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 13:38:28 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
-
-void	ft_free_list_node(t_list **head)
-{
-	ft_lstclear(&((*head)->command), free);
-	ft_lstclear(&((*head)->redic), free);
-	ft_lstclear(&((*head)->here_doc), free);
-}
 
 void	ft_nested_syntax(t_list **head, t_data *data, int *flag)
 {
@@ -31,6 +24,7 @@ void	ft_nested_syntax(t_list **head, t_data *data, int *flag)
 	list = *head;
 	ss = split_end_or(list->content, "<> ", 0);
 	*flag = ft_check_syntax(ss, 2);
+	ft_lstclear(&ss, free);
 	if (!(*flag))
 		ft_split_rediction(list->content, &(list));
 	cmd = join_command(list->command);
@@ -62,23 +56,19 @@ void	ft_syntax(char *line, t_data *data)
 		if (head->x != 4)
 		{
 			list = split_end_or(head->content, "|", 0);
-			free_data.new_list = list;
 			data->red = ft_check_syntax(list, 4);
 			head->new_list = list;
 			while (list && !data->red)
 			{
 				if (list->x != 4)
 					ft_nested_syntax(&list, data, &data->red);
-				ft_free_list_node(&list);
 				list = list->next;
 			}
-			free_list(&free_data, 0);
+			ft_lstclear(&(head->new_list), free);
 		}
 		head = head->next;
 	}
-	free_list(&free_data, 3);
-	if (data->red == 1)
-		data->status = 2;
+	ft_lstclear(&(free_data.head), free);
 }
 
 int	ft_check_syntax(t_list *head, int flag)
@@ -123,7 +113,7 @@ void	ft_check_string(char *line, t_data *data)
 	t_quotes	qutes;
 
 	i = 0;
-	initialize(&qutes);
+	initialize(&qutes, NULL);
 	while (line[i])
 	{
 		ft_check_quotes(line[i], &qutes);
@@ -139,13 +129,13 @@ int	ft_check_wildcard(char *line)
 	t_quotes	qutes;
 
 	i = 0;
-	initialize(&qutes);
+	initialize(&qutes, NULL);
 	while (line[i])
 	{
 		ft_check_quotes(line[i], &qutes);
+		if (qutes.cq || qutes.cs)
+			return (1);
 		i++;
 	}
-	if (qutes.cq || qutes.cs)
-		return (1);
 	return (0);
 }

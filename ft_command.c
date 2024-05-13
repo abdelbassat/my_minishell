@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 19:14:52 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 20:42:17 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 12:29:22 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,32 +50,24 @@ char	*ft_new_strjoin(char *str, char c)
 	return (join);
 }
 
-char	*ft_qutes(char *str, int *i, char c, t_data *data, int flag)
+char	*ft_qutes(t_str *strr, t_data *data, int flag)
 {
 	char	*var;
 	char	*join;
 
-	(*i)++;
+	(strr->i)++;
 	join = NULL;
-	while (str[*i] && str[*i] != c)
+	while (strr->str[strr->i] && strr->str[strr->i] != strr->c)
 	{
-		if (str[*i] == '$' && c == 34 && !flag)
+		if (strr->str[strr->i] == '$' && strr->c == 34 && !flag)
 		{
-			var = ft_return_variable(str, i, data);
-			if (!join)
-				join = ft_strdup("");
+			var = ft_return_variable(strr->str, &(strr->i), data);
 			join = ft_strjoin(join, var);
-			free(var);
 		}
 		else
-		{
-			join = ft_new_strjoin(join, str[*i]);
-			(*i)++;
-		}
+			join = ft_new_strjoin(join, strr->str[(strr->i)++]);
 	}
-	if (!join)
-		join = ft_strdup("");
-	(*i)++;
+	(strr->i)++;
 	return (join);
 }
 
@@ -97,79 +89,63 @@ char	*ft_return_variable(char *str, int *i, t_data *data)
 		(*i)++;
 	}
 	var = ft_getenv(data, var);
-	if (!var)
-		var = ft_strdup("");
 	return (var);
 }
 
-char	*ft_handel_expend(t_list **head, char *var, char *join)
+void	ft_for_wild(char *str, t_list **head)
 {
-	t_list	*expend;
-	char	*value;
 	t_list	*node;
 
+	node = NULL;
+	node = ft_wild_card(str);
+	if (!node)
+		node = ft_lstnew(str);
+	ft_lstadd_back(head, node);
+}
+void	ft_handel_expend(t_list **head, t_str *strr, t_data *data)
+{
+	t_list	*expend;
+	char	*var;
+
 	expend = NULL;
-	value = ft_strdup("");
-	if (var[0])
+	var = ft_return_variable(strr->str, &(strr->i), data);
+	if (var && var[0])
 	{
 		expend = split_end_or(var, " ", 0);
-		expend->content = ft_strjoin(join, expend->content);
+		expend->content = ft_strjoin(strr->join, expend->content);
 		while (expend->next)
 		{
-			node = ft_wild_card(expend->content);
-			ft_lstadd_back(head, node);
+			ft_for_wild(expend->content, head);
 			expend = expend->next;
+			strr->join = NULL;
 		}
-		value = ft_strdup(expend->content);
+		var = ft_strdup(expend->content);
 	}
-	return (value);
+	strr->join = ft_strjoin(strr->join, var);
 }
 
 char	*ft_remove(char *str, t_data *data, int flag, t_list **head)
 {
-	int		i;
-	char	*join;
-	char	c;
-	char	*var;
-	int		ff;
-	char	*res;
+	t_str	strr;
 
-	ff = 0;
-	i = 0;
-	join = NULL;
-	while (str[i])
+	// problem  in expend     ex: var="ls          *"
+	ini_str(&strr);
+	strr.str = str;
+	while (str[strr.i])
 	{
-		if (str[i] == 34 || str[i] == 39)
-			c = str[i];
-		if (str[i] == '$' && !flag)
-		{
-			ff = 1;
-			var = ft_return_variable(str, &i, data);
-			var = ft_handel_expend(head, var, join);
-			join = NULL;
-			join = ft_strjoin(join, var);
-			free(var);
-		}
-		else if (str[i] == c)
-		{
-			res = ft_qutes(str, &i, c, data, flag);
-			join = ft_strjoin(join, res);
-			free(res);
-		}
+		if (str[strr.i] == 34 || str[strr.i] == 39)
+			strr.c = str[strr.i];
+		if (str[strr.i] == '$' && !flag)
+			ft_handel_expend(head, &strr, data);
+		else if (str[strr.i] == strr.c && strr.c)
+			strr.join = ft_strjoin(strr.join, ft_qutes(&strr, data, flag));
 		else
 		{
-			join = ft_new_strjoin(join, str[i]);
-			i++;
+			strr.join = ft_new_strjoin(strr.join, str[strr.i]);
+			strr.i++;
 		}
 	}
-	if (ff == 1)
-	{
-		var = ft_strdup("");
-		var = ft_handel_expend(head, join, var);
-		join = NULL;
-		join = ft_strjoin(join, var);
-	}
-	return (join);
+	return (strr.join);
 }
 
 t_list	*ft_handel_qutes(t_list *head, t_data *data, int flag)
@@ -177,14 +153,22 @@ t_list	*ft_handel_qutes(t_list *head, t_data *data, int flag)
 	t_list	*command;
 	char	*cmd;
 	t_list	*tmp;
+	t_list	*node;
 
 	tmp = head;
 	command = NULL;
 	while (head)
 	{
-		cmd = ft_remove(head->content, data, flag, &command);
-		if (cmd)
-			ft_lstadd_back(&command, ft_lstnew(cmd));
+		if (ft_strchr(head->content, '*') && !ft_check_wildcard(head->content)
+			&& !flag)
+			node = ft_wild_card(head->content);
+		else
+		{
+			cmd = ft_remove(head->content, data, flag, &command);
+			node = ft_lstnew(cmd);
+		}
+		ft_lstadd_back(&command, node);
+		node = NULL;
 		head = head->next;
 	}
 	ft_lstclear(&tmp, free);

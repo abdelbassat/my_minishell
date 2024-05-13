@@ -6,24 +6,11 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 03:16:22 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 13:12:27 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 09:43:13 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
-
-void	ft_free(char **str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		free(str[i]);
-		i++;
-	}
-	free(str);
-}
 
 char	*ft_strdup_if(char *str, char c)
 {

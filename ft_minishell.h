@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 04:34:29 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 18:42:36 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 11:36:52 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ void		ft_lstnew_back(t_list **head, char *cont, int flag);
 void		ft_exec_redic(t_list *head, t_data *data, int flag);
 int			ft_check_syntax(t_list *head, int flag);
 void		ft_nested_pip_ex(t_list *head, t_data *data, int fd1, int fd0);
+void	ini_str(t_str *data);
 t_list		*ft_nested_pip(char *line, t_data *data);
 t_list		*split_end_or(char *str, char *set, int flag);
 void		ft_check_string(char *str, t_data *data);
@@ -96,7 +97,7 @@ void		ft_display(t_list *ptr);
 int			access_intfile(char *path);
 int			access_outfile(char *path);
 void		ft_free_list_node(t_list **head);
-char		*ft_qutes(char *str, int *i, char c, t_data *data, int flag);
+char	*ft_qutes(t_str *strr , t_data *data, int flag);
 void		ft_free_trees(t_list **head);
 void		red(void);
 void		cyan(void);
@@ -120,14 +121,15 @@ int			ft_wild_card_string_matching(char *s, char *p);
 t_list		*ft_wild_card(char *p);
 int			ft_check_wildcard(char *line);
 t_list		*ft_join(t_list *head);
-void		initialize(t_quotes *data);
+t_list	*ft_wild_card(char *p);
+void	initialize(t_quotes *qutes , t_data *data);
 char		*ft_return_variable(char *str, int *i, t_data *data);
 char		*ft_new_strjoin(char *str, char c);
 char		*ft_getenv(t_data *data, char *search);
 void		close_fd(t_list **tmp, t_data *data, int fd0);
 void		check_eo(t_list *head, t_data *data, int fd1, int fd0);
 void		wait_proccess(t_data *data, int proc);
-char		*ft_handel_expend(t_list **head, char *var, char *join);
+void ft_handel_expend(t_list **head , t_str *strr , t_data *data);
 char		*ft_search_if_key_exist_env_home(t_list **env, char *head,
 				t_data *data);
 t_list		*ft_create_var(char *command, char c);
@@ -148,4 +150,7 @@ void		ft_exit(t_list *head, t_data *data);
 void		handle_signal(int sig);
 void		handle_signal_cat(int sig);
 char		*ft_remove(char *str, t_data *data, int flag, t_list **head);
+void	handle_signal(int sig);
+void	handle_signal_cat(int sig);
+void	ft_handle_signals(void);
 #endif

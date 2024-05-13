@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 01:43:33 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/05 01:48:08 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 09:44:41 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	ft_count_qutes(char *line, t_quotes *qutes)
 	int	i;
 
 	i = 0;
-	initialize(qutes);
+	initialize(qutes, NULL);
 	while (line[i])
 	{
 		ft_check_quotes(line[i], qutes);
@@ -26,12 +26,4 @@ int	ft_count_qutes(char *line, t_quotes *qutes)
 		i++;
 	}
 	return (0);
-}
-
-void	free_list(t_free *head, int flag)
-{
-	if (flag != 0)
-		ft_lstclear(&(head->head), free);
-	else
-		ft_lstclear(&(head->new_list), free);
 }

@@ -1,37 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipe.c                                          :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/25 15:24:21 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/13 09:39:30 by abquaoub         ###   ########.fr       */
+/*   Created: 2024/05/13 09:41:17 by abquaoub          #+#    #+#             */
+/*   Updated: 2024/05/13 09:41:24 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
 
-void	initialize(t_quotes *qutes, t_data *data)
+void	handle_signal(int sig)
 {
-	if (qutes)
+	if (sig == SIGINT)
 	{
-		qutes->cp = 0;
-		qutes->cq = 0;
-		qutes->cs = 0;
-		qutes->en = 0;
-		qutes->bk = 0;
+		printf("\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
+		rl_redisplay();
 	}
-	if (data)
+}
+void	handle_signal_cat(int sig)
+{
+	if (sig == SIGINT)
 	{
-		data->status = 0;
-		data->in = 0;
-		data->intfile = 0;
-		data->outfile = 1;
-		data->out = 1;
-		data->exec = 0;
-		data->red = 0;
-		data->check_Cmd = 0;
-		data->env_list = NULL;
+		printf("\n");
+		rl_replace_line("", 0);
+		rl_on_new_line();
 	}
+}
+void	ft_handle_signals(void)
+{
+	if (signal(SIGINT, handle_signal) == SIG_ERR)
+		printf("Error catch signal\n");
+	signal(SIGINT, handle_signal);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTERM, SIG_IGN);
 }

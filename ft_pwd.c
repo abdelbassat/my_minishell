@@ -6,36 +6,11 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 03:28:31 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/04 18:01:34 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 12:35:10 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_minishell.h"
-
-void	green(void)
-{
-	printf("\e[1;32m");
-}
-
-void	red(void)
-{
-	printf("\e[1;31m");
-}
-
-void	cyan(void)
-{
-	printf("\033[0;37m");
-}
-
-void	yellow(void)
-{
-	printf("\e[1;33m");
-}
-
-void	reset(void)
-{
-	printf("\033[0m");
-}
 
 char	*ft_pwd(int flag)
 {

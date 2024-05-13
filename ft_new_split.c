@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/03 16:59:46 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/09 10:28:43 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 13:24:14 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	ini_str(t_str *data)
 	data->join = NULL;
 	data->flag = 0;
 	data->c = 0;
+	data->i = 0;
 }
 
 void	ft_lstnew_back(t_list **head, char *cont, int flag)
@@ -105,24 +106,24 @@ t_list	*split_end_or(char *line, char *set, int check)
 {
 	int			i;
 	t_list		*head;
-	t_quotes	data;
+	t_quotes	qutes;
 	t_str		strr;
 	int			ff;
 
 	head = NULL;
 	i = 0;
 	ini_str(&strr);
-	initialize(&data);
+	initialize(&qutes, NULL);
 	strr.str = line;
 	ff = 4;
 	if (!strcmp(set, "<> "))
 		ff = 2;
 	while (line[i])
 	{
-		ft_check_quotes(line[i], &data);
+		ft_check_quotes(line[i], &qutes);
 		charset(line[i], set, &strr);
 		if (line[i] == strr.c && (line[i + 1] == strr.c || check == 0)
-			&& !data.cp && !data.cq && !data.cs)
+			&& !qutes.cp && !qutes.cq && !qutes.cs)
 			strr.flag = 1;
 		else
 			strr.join = ft_new_strjoin(strr.join, line[i]);

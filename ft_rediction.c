@@ -6,7 +6,7 @@
 /*   By: abquaoub <abquaoub@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/17 23:19:20 by abquaoub          #+#    #+#             */
-/*   Updated: 2024/05/12 20:08:58 by abquaoub         ###   ########.fr       */
+/*   Updated: 2024/05/13 11:33:15 by abquaoub         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,35 +56,35 @@ void	ft_exec_redic(t_list *head, t_data *data, int flag)
 	}
 }
 
-char	*ft_remove_v1(char *str, t_data *data)
-{
-	int		i;
-	char	*join;
-	char	c;
-	char	*var;
+// char	*ft_remove_v1(char *str, t_data *data)
+// {
+// 	int		i;
+// 	char	*join;
+// 	char	c;
+// 	char	*var;
 
-	var = NULL;
-	i = 0;
-	join = NULL;
-	while (str[i])
-	{
-		if (str[i] == 34 || str[i] == 39)
-			c = str[i];
-		if (str[i] == '$')
-		{
-			var = ft_return_variable(str, &i, data);
-			join = ft_strjoin(join, var);
-		}
-		else if (str[i] == c)
-			join = ft_strjoin(join, ft_qutes(str, &i, c, data, 0));
-		else
-		{
-			join = ft_new_strjoin(join, str[i]);
-			i++;
-		}
-	}
-	return (join);
-}
+// 	var = NULL;
+// 	i = 0;
+// 	join = NULL;
+// 	while (str[i])
+// 	{
+// 		if (str[i] == 34 || str[i] == 39)
+// 			c = str[i];
+// 		if (str[i] == '$')
+// 		{
+// 			var = ft_return_variable(str, &i, data);
+// 			join = ft_strjoin(join, var);
+// 		}
+// 		else if (str[i] == c)
+// 			join = ft_strjoin(join, ft_qutes(str, &i, c, data, 0));
+// 		else
+// 		{
+// 			join = ft_new_strjoin(join, str[i]);
+// 			i++;
+// 		}
+// 	}
+// 	return (join);
+// }
 void	ft_handle_red(int i)
 {
 	(void)i;
@@ -128,8 +128,8 @@ int	ft_read_stdin(char *end, t_data *data)
 		buff = readline("> ");
 		if (!buff || !strcmp(buff, end))
 			break ;
-		if (data)
-			buff = ft_remove_v1(buff, data);
+		// if (data)
+		// buff = ft_return_variable(buff, data);
 		write(fd, buff, ft_strlen(buff));
 		write(fd, "\n", 1);
 	}
